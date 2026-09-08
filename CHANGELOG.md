@@ -1,0 +1,75 @@
+# Changelog
+
+Notable changes to Deep. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+
+Because this is a copy-in template rather than a published package, **the changelog is
+the only upgrade path**. Nobody can `npm update` a copy they took last month — they
+read this file and apply what matters to them. So entries here say what to change in
+your own copy, not just what moved in this repo.
+
+Nothing has been tagged or released yet; everything below is on `main`.
+
+## [Unreleased]
+
+### Added
+
+- `--dp-good-text`, `--dp-warn-text`, `--dp-bad-text` — a second step for the status
+  triad, for text. The existing `--dp-*` tokens keep their meaning as the solid step
+  for fills, borders and icons.
+  **In your copy:** anywhere you wrote status colour on *words*, switch to the
+  `-text` token. `text-[var(--dp-warn)]` → `text-[var(--dp-warn-text)]`.
+- `scripts/check-contrast.mjs` (`npm run check:contrast`) — measures 224
+  foreground/background pairs across both themes, straight out of `tokens.css`.
+- Tests for the Markdown parser (`npm test`), run by `node --test` with no transpile
+  step. Requires Node 22.18+.
+- GitHub Actions CI: typecheck, tests, contrast, demo build, on Node 22 and 24.
+- `examples/demo` — a Vite gallery rendering every token and primitive, importing
+  `../../src` directly so it cannot drift from the source.
+- `LICENSE` (MIT), `CONTRIBUTING.md`, and a Credits section naming shadcn/ui, Base UI,
+  Lucide, cva, Tailwind and tw-animate-css.
+
+### Changed
+
+- **Renamed from DataPond to Deep.** `--dp-*` and `.dp-*` are unchanged — `dp` is now
+  short for *deep*. **In your copy:** nothing to do.
+- **The light palette was retuned for WCAG AA**, holding hue and saturation and moving
+  only lightness. **In your copy:** these are token values, so a copy of `tokens.css`
+  picks them up wholesale.
+  - `--primary` `#0894ac` → `#066c7d` (white label on the filled button was 3.59:1)
+  - `--destructive` `#e11d48` → `#bd183c` (text on the tinted button was 4.00:1)
+  - `--dp-warn` `#e08a00` → `#c17700`, `--dp-good` `#0f9d6c` → `#0f9b6b` (icons
+    below 3:1)
+  - `--dp-managed` `#0e7490` → `#0d6b85`
+  - `--dp-aqua`, `--ring`, `--sidebar-primary`, `--sidebar-ring` follow `--primary`
+- **The chart ramp was respaced by hue** in both themes. The old ramp had two teals
+  three degrees apart — one series, as far as a reader is concerned — and two of the
+  five fell below 3:1 in the light theme. The five are now at least 53 degrees apart
+  and all clear 3:1.
+  **In your copy:** if you hardcoded a series colour anywhere instead of reading
+  `--chart-n`, re-check it.
+- `Card` moved from `React.forwardRef` to the `data-slot` convention the other 23
+  primitives use. Its markup and classes are unchanged.
+  **In your copy:** drop-in, unless you were passing `ref` in a way that depended on
+  `forwardRef` specifically.
+- `Toast` now paints from tokens, announces (`role="alert"` for errors, `role="status"`
+  otherwise), labels its close button, and clears its timers on unmount.
+- The Markdown parser's doc comment was rewritten — it carried internal product
+  narrative that meant nothing outside the original codebase.
+
+### Fixed
+
+- `Skeleton` was filled with a hardcoded `bg-slate-800/50`, which rendered as a dark
+  block in the light theme. Now `bg-foreground/10`, which reads on any surface in
+  either theme.
+- `ErrorBox` rendered in `--dp-warn` (amber). It is an error box; it now uses
+  `--dp-bad` with `--dp-bad-text`.
+- `Toast` leaked its `setTimeout` timers when the provider unmounted, and generated
+  ids with `Math.random().toString(36).substring(7)`, which can collide.
+- `tokens.css` documented its own import path as `./datapond/tokens.css` while the
+  README said `./tokens.css`.
+
+## [1.0.0] — 2026-08-31
+
+Initial extraction from [DataPond](https://github.com/lukesgood/datapond): theme
+tokens plus 24 primitives, as a standalone copy-in template.

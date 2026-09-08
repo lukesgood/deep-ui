@@ -18,7 +18,10 @@
     "design-tokens"
   ],
   "scripts": {
+    "test": "node --test \"test/**/*.test.ts\"",
+    "check:contrast": "node scripts/check-contrast.mjs",
     "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm test && npm run check:contrast && npm run demo:build",
     "demo": "npm run dev -w deep-ui-demo",
     "demo:build": "npm run build -w deep-ui-demo"
   },
@@ -39,5 +42,8 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=22.18"
   }
 }

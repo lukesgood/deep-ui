@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same PR cancels the run still in flight.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22.18 is the floor: below it `node --test` cannot read the .ts test
+        # files without a transpile step, and this repo deliberately has none.
+        node: [22, 24]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      # Kept as separate steps rather than `npm run check`, so a red run says
+      # which thing broke without anyone opening the log.
+      - name: Typecheck the template
+        run: npm run typecheck
+
+      - name: Typecheck the demo
+        run: npm run typecheck -w deep-ui-demo
+
+      - name: Parser tests
+        run: npm test
+
+      - name: Palette contrast
+        run: npm run check:contrast
+
+      - name: Build the demo
+        run: npm run demo:build

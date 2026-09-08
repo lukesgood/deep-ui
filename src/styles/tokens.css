@@ -92,12 +92,16 @@
   --border: #dae5e8;
   --input: #d3e0e3;
   --ring: #066c7d;
-  /* data-viz categorical ramp (charts stop being grey) */
-  --chart-1: #0894ac;
-  --chart-2: #6366f1;
-  --chart-3: #22c3d6;
-  --chart-4: #8b5cf6;
-  --chart-5: #f59e0b;
+  /* Data-viz categorical ramp. Series are told apart by HUE, not lightness, so
+     the five are spaced at least 53 degrees apart — the old ramp had two teals
+     3 degrees apart, which is one series as far as a reader is concerned. Each
+     also clears 3:1 against every surface, since a thin plotted line is
+     non-text content someone still has to see. */
+  --chart-1: #0995ad;
+  --chart-2: #5f58e4;
+  --chart-3: #d756b7;
+  --chart-4: #539924;
+  --chart-5: #d26d09;
   --radius: 0.7rem;
   /* sidebar = the sunken floor; active nav lifts to a surface */
   --sidebar: #e6eef0;
@@ -152,11 +156,12 @@
   --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.13);
   --ring: #22c3d6;
-  --chart-1: #22c3d6;
-  --chart-2: #818cf8;
-  --chart-3: #67e8f9;
-  --chart-4: #a78bfa;
-  --chart-5: #fbbf24;
+  /* the same five hues, lifted into the brightness this ground wants */
+  --chart-1: #23bcd7;
+  --chart-2: #847ef7;
+  --chart-3: #e755c2;
+  --chart-4: #80cb4d;
+  --chart-5: #fbbd23;
   --sidebar: #0a171b;
   --sidebar-foreground: #b8cbd1;
   --sidebar-primary: #22c3d6;

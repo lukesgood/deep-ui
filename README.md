@@ -136,10 +136,14 @@ family, and `--chart-1` … `--chart-5`. Use them through Tailwind utilities as 
 The accent is aqua — `#066c7d` light, `#22c3d6` dark. `--radius` is `0.7rem`, and the
 `--radius-sm…4xl` scale is derived from it, so changing that one value rescales everything.
 
-The light accent is a deeper aqua than the chart ramp's `#0894ac`, and that is deliberate:
+The light accent is a deeper aqua than the chart ramp's `#0995ad`, and that is deliberate:
 `--primary` carries white text on the filled button and is itself used as link text, so it
-has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` keeps the
-brighter value. See [Accessibility](#accessibility).
+has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` stays a
+touch brighter. See [Accessibility](#accessibility).
+
+`--chart-1` … `--chart-5` are spaced at least 53 degrees apart in hue, in both themes.
+Categorical series are told apart by hue, not lightness — an earlier ramp had two teals
+three degrees apart, which is one series as far as a reader is concerned.
 
 ### Deep extras
 
@@ -223,10 +227,21 @@ was measured, in both themes, against all four surfaces (`--card`, `--background
 button or an inline error actually renders:
 
 - text tokens clear **4.5:1** (WCAG 2.1 AA, normal text)
-- the solid status step and the focus ring clear **3:1** (AA non-text)
+- the solid status step, the chart ramp and the focus ring clear **3:1** (AA non-text)
 
-That is 158 pairs, and they all pass. Several light-theme values are darker than a stock
+That is 224 pairs, and they all pass. Several light-theme values are darker than a stock
 shadcn palette for exactly this reason.
+
+This is not a claim you have to take on trust, and it is not a claim that rots:
+
+```bash
+npm run check:contrast                # summary
+npm run check:contrast -- --verbose   # every pair, with its ratio
+```
+
+The checker reads the real values out of `tokens.css`, and it **fails on any token it
+cannot parse** rather than skipping it — a checker that quietly ignores what it does not
+understand reports green for the wrong reason. CI runs it on every push.
 
 **What it does not guarantee.** Two things are known gaps, both inherited from shadcn's
 defaults, and both left alone because closing them changes the look rather than a value:
@@ -240,8 +255,8 @@ defaults, and both left alone because closing them changes the look rather than 
   screen-reader audit.** Treat the components as a good starting point, not a compliance
   claim.
 
-The measurements live in the git history of this section, not in a test — if you retune a
-colour, re-measure it.
+The excluded tokens are listed in `scripts/check-contrast.mjs` with a reason each, so the
+exclusions are as reviewable as the assertions.
 
 ---
 
@@ -279,16 +294,28 @@ is MIT and stands alone. What changed:
 
 ## Verifying a change
 
-The root `package.json` and `tsconfig.json` are here for type-checking only; the template
-itself is never built or published. The demo is a real Vite app and does build.
+The template itself is never built or published; `package.json` and `tsconfig.json` are
+here so it can be type-checked and tested standalone. The demo is a real Vite app and does
+build.
 
 ```bash
 npm install
-npm run typecheck    # tsc --noEmit across the template's 29 files
-npm run demo:build   # builds examples/demo — catches anything typecheck can't
+npm run check        # everything below, which is exactly what CI runs
 ```
 
-There is no test suite yet, and no CI. Both are worth adding before this gets much use.
+```bash
+npm run typecheck       # the template and the tests
+npm test                # the Markdown parser — node --test, no transpile step
+npm run check:contrast  # the palette, measured against tokens.css
+npm run demo:build      # builds examples/demo — catches what typecheck can't
+```
+
+Needs Node **22.18+**: the tests are `.ts` files run directly by `node --test` using
+native type stripping. CI runs the same steps on Node 22 and 24.
+
+The React components have no tests. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
+actually enforced, and [CHANGELOG.md](./CHANGELOG.md) — which, for a copy-in template, is
+the only upgrade path there is.
 
 ---
 
