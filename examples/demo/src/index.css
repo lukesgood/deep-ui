@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* The primitives live outside this app's root, so Tailwind has to be told to scan
+   them — otherwise every class used only inside src/components/ui is tree-shaken. */
+@source "../../../src";
+
+@import "../../../src/styles/tokens.css";

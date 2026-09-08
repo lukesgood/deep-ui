@@ -2,9 +2,25 @@
   "name": "datapond-ui",
   "version": "1.0.0",
   "private": true,
+  "workspaces": [
+    "examples/demo"
+  ],
   "description": "DataPond design system — copy-in source template (tokens + shadcn/base-nova primitives)",
+  "license": "MIT",
+  "author": "Luke",
+  "keywords": [
+    "design-system",
+    "react",
+    "tailwindcss",
+    "shadcn",
+    "base-ui",
+    "ui-components",
+    "design-tokens"
+  ],
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "demo": "npm run dev -w demo",
+    "demo:build": "npm run build -w demo"
   },
   "comment": "Not published. This package.json exists so the template can be type-checked standalone, and so it doubles as the exact dependency list a consuming app must install.",
   "dependencies": {

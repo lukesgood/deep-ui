@@ -1,17 +1,18 @@
-/** A deliberately small Markdown subset — the parts a model actually emits.
+/** A deliberately small Markdown subset — headings, bold, italic, inline code,
+ *  fenced code, bullet and numbered lists, and optional `[1]` citation markers.
+ *  That is the set a language model actually emits in chat-style output.
  *
- *  The assistant panel rendered raw text, so `**bold**` reached the user as
- *  asterisks. Knowledge handled `**bold**` and nothing else, so lists arrived as
- *  lines beginning with a hyphen and headings as lines beginning with hashes.
+ *  No library, on purpose. A general Markdown parser pulls in a tree of transitive
+ *  packages to render six constructs, which is a poor trade for a surface this
+ *  small — especially in a template meant to be copied into someone else's app.
+ *  Parsing is kept separate from rendering (see components/ui/markdown.tsx) so this
+ *  half can be exercised on its own.
  *
- *  No library. The dependency scan is a merge gate now, and a Markdown parser pulls
- *  in a tree of transitive packages to render six constructs in two chat bubbles.
- *  Parsing is separated from rendering so this half can be exercised directly.
- *
- *  Links are deliberately NOT clickable. In a cited answer the prose is derived from
- *  ingested documents, so a URL in it can come from whatever someone put in a file —
- *  turning that into an anchor makes the answer panel a phishing surface. The label
- *  and the URL are both shown as text; a person can still read and copy it.
+ *  Links are deliberately NOT turned into anchors. This renderer is built for text
+ *  of uncertain provenance — model output, or prose derived from ingested documents
+ *  — where a URL can be whatever someone put in a file. Making those clickable turns
+ *  the panel into a phishing surface. Label and URL are both shown as plain text, so
+ *  a reader can still see and copy them.
  */
 
 export type Inline =
