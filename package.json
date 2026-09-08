@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "demo": "npm run dev -w demo",
-    "demo:build": "npm run build -w demo"
+    "demo": "npm run dev -w deep-ui-demo",
+    "demo:build": "npm run build -w deep-ui-demo"
   },
   "comment": "Not published. This package.json exists so the template can be type-checked standalone, and so it doubles as the exact dependency list a consuming app must install.",
   "dependencies": {
