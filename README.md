@@ -1,17 +1,19 @@
-# DataPond Design System
+# Deep
 
-The design system extracted from DataPond — theme tokens plus 24 UI primitives —
-packaged as a **copy-in source template** you can drop into any React app.
+**Layered depth, one aqua current.** Neutrals are slate hue-biased toward the aqua accent
+rather than left at a default grey, elevation is carried by a two-stop shadow plus a faint
+top hairline, and a single gradient does all the emphasis work.
 
-MIT licensed. Copy it, edit it, ship it.
+Theme tokens plus 24 UI primitives, packaged as a **copy-in source template** you can drop
+into any React app. MIT licensed — copy it, edit it, ship it.
 
 There is no build step and nothing to `npm install` from a registry. You copy `src/` into
 your project, install the peer dependencies, and own the code from then on. That is the
 same model shadcn/ui uses, and it is deliberate: these components are meant to be edited.
 
-**"Deep pond": layered depth, one aqua current.** Neutrals are slate hue-biased toward the
-aqua accent rather than left at a default grey, elevation is carried by a two-stop shadow
-plus a faint top hairline, and a single gradient does all the emphasis work.
+Originally extracted from [DataPond](https://github.com/lukesgood/datapond) and since
+taken further — see [Differences from DataPond's copy](#differences-from-dataponds-copy).
+The `dp` in `--dp-*` and `.dp-*` is this system's name, not that one's.
 
 | Light | Dark |
 |---|---|
@@ -73,10 +75,10 @@ just a CLI — `tokens.css` imports its stylesheet.)
 ### 2. Copy the source
 
 ```bash
-cp -r datapond-ui/src/components/ui   your-app/components/
-cp -r datapond-ui/src/lib/*           your-app/lib/
-cp -r datapond-ui/src/hooks/*         your-app/hooks/
-cp    datapond-ui/src/styles/tokens.css  your-app/app/
+cp -r deep-ui/src/components/ui   your-app/components/
+cp -r deep-ui/src/lib/*           your-app/lib/
+cp -r deep-ui/src/hooks/*         your-app/hooks/
+cp    deep-ui/src/styles/tokens.css  your-app/app/
 ```
 
 Adjust to taste — the only hard requirement is that your `@/*` alias points at whatever
@@ -139,7 +141,7 @@ The light accent is a deeper aqua than the chart ramp's `#0894ac`, and that is d
 has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` keeps the
 brighter value. See [Accessibility](#accessibility).
 
-### DataPond extras
+### Deep extras
 
 These are **not** Tailwind theme colors — reach them with arbitrary-value syntax,
 `text-[var(--dp-good-text)]` or `bg-[var(--dp-good)]/10`.
@@ -243,10 +245,11 @@ colour, re-measure it.
 
 ---
 
-## Differences from DataPond's own copy
+## Differences from DataPond's copy
 
-This template is not a byte-for-byte snapshot. It stands alone, and a few things were
-fixed on the way out:
+This started as a snapshot of [DataPond](https://github.com/lukesgood/datapond)'s own
+components and is no longer one. DataPond is Apache-2.0 and remains its own project; this
+is MIT and stands alone. What changed:
 
 1. **`ErrorBox` was decoupled.** DataPond's version hardcoded an "no embedding or LLM model
    is configured" hint and a `next/link` to `/settings`. That is now an optional `hint`
@@ -317,7 +320,5 @@ You are copying source into your own project, so the practical reading is: keep 
 copyright notice somewhere (a `NOTICES` file, a header, your third-party page), and
 otherwise do what you like. No attribution in your UI is required.
 
-**Trademarks are not covered.** MIT grants rights to the code, not to names or marks.
-The "DataPond" name and any DataPond logo are excluded from the license. Keep the
-`--dp-*` tokens and `.dp-*` classes if you find them convenient — they are just
-identifiers — but don't present a fork as DataPond.
+The `--dp-*` tokens and `.dp-*` classes carry the system's name, but they are prefixes,
+not an API — rename them in your copy if you would rather they said something else.

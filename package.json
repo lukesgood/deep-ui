@@ -1,11 +1,11 @@
 {
-  "name": "datapond-ui",
+  "name": "deep-ui",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
     "examples/demo"
   ],
-  "description": "DataPond design system — copy-in source template (tokens + shadcn/base-nova primitives)",
+  "description": "Deep — a copy-in design system source template (tokens + shadcn/base-nova primitives)",
   "license": "MIT",
   "author": "Luke",
   "keywords": [

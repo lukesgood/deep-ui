@@ -124,7 +124,7 @@ function Swatches({ tokens }: { tokens: TokenList }) {
 /* ────────────────────────────── 1. tokens ────────────────────────────────── */
 
 const SURFACES = [
-  ["--background", "the pond floor"],
+  ["--background", "the floor"],
   ["--card", "a surface on it"],
   ["--popover", "overlays"],
   ["--muted", "recessed fills"],
@@ -457,7 +457,7 @@ function DataSection() {
                 Connection details <ArrowUpRight className="size-3.5" />
               </CollapsibleTrigger>
               <CollapsibleContent className="pt-2 text-xs text-muted-foreground">
-                <code className="font-mono">postgres://pond.internal:5432/events</code>
+                <code className="font-mono">postgres://warehouse.internal:5432/events</code>
               </CollapsibleContent>
             </Collapsible>
             <Separator />
@@ -645,7 +645,7 @@ function FeedbackSection() {
           <div className="space-y-4">
             <ErrorBox
               msg="connect ECONNREFUSED 10.0.4.19:5432"
-              hint={<>The pond is unreachable — check the network policy.</>}
+              hint={<>The warehouse is unreachable — check the network policy.</>}
               action={<Button size="xs" variant="outline">Retry</Button>}
             />
             <Separator />
