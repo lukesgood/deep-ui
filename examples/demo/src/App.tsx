@@ -118,7 +118,7 @@ export default function App() {
             </Sidebar>
 
             <SidebarInset>
-              <header className="sticky top-0 z-30 flex h-12 shrink-0 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur">
+              <header className="sticky top-0 z-[var(--dp-z-sticky)] flex h-12 shrink-0 items-center gap-2 border-b bg-background/85 px-3 backdrop-blur">
                 <SidebarTrigger />
                 <Separator orientation="vertical" className="mr-1 h-4" />
                 <Breadcrumb>

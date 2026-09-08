@@ -136,6 +136,10 @@ family, and `--chart-1` … `--chart-5`. Use them through Tailwind utilities as 
 The accent is aqua — `#066c7d` light, `#22c3d6` dark. `--radius` is `0.7rem`, and the
 `--radius-sm…4xl` scale is derived from it, so changing that one value rescales everything.
 
+Type comes from Tailwind's scale plus one step: **`text-2xs`** (11px), because dense UI —
+code blocks, citation markers, table furniture — kept reaching below Tailwind's 12px floor
+and landing on arbitrary values instead.
+
 The light accent is a deeper aqua than the chart ramp's `#0995ad`, and that is deliberate:
 `--primary` carries white text on the filled button and is itself used as link text, so it
 has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` stays a
@@ -184,6 +188,43 @@ the two are the same value and the distinction costs you nothing.
 
 A `shake` keyframe is also defined, for invalid-input feedback:
 `className={invalid ? "[animation:shake_0.5s_ease-in-out]" : ""}`.
+
+### Layers
+
+Stacking order is a scale like any other. Every overlay used to sit at `z-50`, which meant
+the order they stacked in was whatever order they reached the DOM — the visible symptom
+being a toast raised from inside a dialog going *behind* it, hiding the confirmation of
+the thing you just did.
+
+Tailwind v4 has no z-index theme namespace, so reach these with arbitrary-value syntax:
+`z-[var(--dp-z-modal)]`.
+
+| Token | | |
+|---|---|---|
+| `--dp-z-raised` | 10 | fixed page chrome — the app sidebar |
+| `--dp-z-sticky` | 30 | sticky headers, and the sidebar's drag rail |
+| `--dp-z-backdrop` | 40 | the dim behind a modal |
+| `--dp-z-modal` | 50 | dialog, alert dialog, sheet |
+| `--dp-z-popover` | 60 | dropdown, select — must open above a modal |
+| `--dp-z-tooltip` | 70 | sits above whatever it describes, anywhere |
+| `--dp-z-toast` | 80 | confirms what you just did; nothing covers it |
+
+The ladder is deliberately sparse. If you need a step between two of these, what you
+probably want is a local stacking context, not a new rung.
+
+### Motion
+
+There is no motion token scale, on purpose — Tailwind's own is enough, and a parallel set
+of names would be ceremony. The convention: `duration-100` for a state change,
+`duration-150` by default, `duration-200` for something entering or leaving the page.
+
+What the system does add is the part Tailwind leaves to you. A reader who has asked their
+OS for less movement gets it, across all three sources of motion at once — Tailwind's
+transition utilities, `tw-animate-css`'s enter/exit animations, and the `shake` keyframe:
+
+```css
+@media (prefers-reduced-motion: reduce) { /* in tokens.css */ }
+```
 
 ### Fonts
 
@@ -250,10 +291,10 @@ defaults, and both left alone because closing them changes the look rather than 
   boundary is that border, WCAG 1.4.11 wants 3:1, which in practice means a much heavier
   edge than the soft look the system is going for. If you need to meet 1.4.11 strictly,
   darken `--input`.
-- The components are keyboard-operable and labelled, and toasts announce (errors as
-  `role="alert"`, the rest as `role="status"`), but **none of this has been through a
-  screen-reader audit.** Treat the components as a good starting point, not a compliance
-  claim.
+- The components are keyboard-operable and labelled, toasts announce (errors as
+  `role="alert"`, the rest as `role="status"`), and `prefers-reduced-motion` is honoured,
+  but **none of this has been through a screen-reader audit.** Treat the components as a
+  good starting point, not a compliance claim.
 
 The excluded tokens are listed in `scripts/check-contrast.mjs` with a reason each, so the
 exclusions are as reviewable as the assertions.
@@ -306,6 +347,7 @@ npm run check        # everything below, which is exactly what CI runs
 ```bash
 npm run typecheck       # the template and the tests
 npm test                # the Markdown parser — node --test, no transpile step
+npm run check:tokens    # no literal colours, no raw z-index, no one-off type sizes
 npm run check:contrast  # the palette, measured against tokens.css
 npm run demo:build      # builds examples/demo — catches what typecheck can't
 ```

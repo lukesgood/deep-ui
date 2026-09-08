@@ -34,9 +34,9 @@ repo deliberately does not have one.
 npm run check
 ```
 
-That runs everything CI runs: typecheck of the template and the demo, the parser
-tests, the palette contrast check, and a demo build. CI runs the same steps on Node
-22 and 24.
+That runs everything CI runs: typecheck of the template and the demo, the parser tests,
+the token linter, the palette contrast check, and a demo build. CI runs the same steps on
+Node 22 and 24.
 
 ## The rules that are actually enforced
 
@@ -59,10 +59,28 @@ If you need a colour the tokens do not have, add the token.
 Painting a shape? Solid. Writing a word? `-text`. Getting this backwards is the most
 likely way to fail the contrast check.
 
+### Stacking order comes off the ladder
+
+`z-[var(--dp-z-modal)]`, not `z-50`. The tokens are `--dp-z-raised`, `-sticky`,
+`-backdrop`, `-modal`, `-popover`, `-tooltip`, `-toast`, in that order. Everything used to
+sit at `z-50`, and the result was that what covered what depended on DOM order.
+
+A raw `z-N` is allowed only inside a component's *own* stacking context — the scroll
+buttons within a select popup, say. `scripts/check-tokens.mjs` holds those exceptions with
+a reason each; if you add one, add the reason in the same place.
+
+### Type sizes come off the scale
+
+Tailwind's steps plus `text-2xs` (11px). If you need a size that is not there, add a step
+to `@theme` rather than reaching for `text-[13px]`. The one exception the linter allows is
+`em`-relative sizing — `text-[0.9em]` on inline code is measured against its parent, which
+no fixed step can express.
+
 ### Any colour change must survive the checker
 
 ```bash
-npm run check:contrast            # summary
+npm run check:tokens                  # literal colours, raw z-index, one-off type sizes
+npm run check:contrast                # summary
 npm run check:contrast -- --verbose   # every pair, with its ratio
 ```
 
@@ -103,6 +121,9 @@ The React components have no tests yet. A PR that adds them is welcome; a PR tha
 changes a component is not blocked on it.
 
 ## Accessibility
+
+`prefers-reduced-motion` is honoured globally in `tokens.css`, so you do not need to
+guard individual animations — but do not fight it either.
 
 The palette is measured. The components are not audited. Keyboard operability and
 labelling are expected of anything new, but nobody has put this through a screen

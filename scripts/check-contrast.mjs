@@ -69,13 +69,20 @@ const hex = (c) =>
 
 /* ── tokens ───────────────────────────────────────────────────────────────── */
 
-/** Pull one `selector { … }` block's custom properties out of the stylesheet. */
+/** Custom properties for one selector, merged across every block that declares it.
+ *  A stylesheet may open `:root` more than once — the palette in one place, the
+ *  stacking ladder in another — and reading only the first block would measure
+ *  whichever one happened to come first. */
 function readBlock(css, selector) {
-  const start = css.indexOf(`${selector} {`)
-  if (start === -1) throw new Error(`${selector} block not found in tokens.css`)
-  const end = css.indexOf("\n}", start)
+  const blocks = []
+  for (let i = css.indexOf(`${selector} {`); i !== -1; i = css.indexOf(`${selector} {`, i + 1)) {
+    const end = css.indexOf("\n}", i)
+    if (end === -1) throw new Error(`unterminated ${selector} block in tokens.css`)
+    blocks.push(css.slice(i, end))
+  }
+  if (!blocks.length) throw new Error(`${selector} block not found in tokens.css`)
   const out = {}
-  for (const line of css.slice(start, end).split("\n")) {
+  for (const line of blocks.join("\n").split("\n")) {
     const m = line.match(/^\s*(--[\w-]+)\s*:\s*([^;]+);/)
     if (!m) continue
     // Gradients, shadows and font stacks are not single colours; skip by shape.

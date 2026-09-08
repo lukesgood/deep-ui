@@ -14,6 +14,19 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **A stacking ladder**: `--dp-z-raised` (10), `-sticky` (30), `-backdrop` (40), `-modal`
+  (50), `-popover` (60), `-tooltip` (70), `-toast` (80).
+  **In your copy:** if you wrote your own overlay at `z-50`, it now ties with dialogs.
+  Put it on a rung.
+- **`prefers-reduced-motion` support**, as a blanket rule in `tokens.css`. The motion
+  comes from three places at once — Tailwind transitions, `tw-animate-css` enter/exit
+  animations, and the `shake` keyframe — and none of them route through a variable that
+  could simply be zeroed.
+  **In your copy:** picked up with `tokens.css`; drop any per-component guard you added.
+- **`text-2xs`** (11px), one step below Tailwind's floor, for dense UI.
+- `scripts/check-tokens.mjs` (`npm run check:tokens`) — fails on literal palette colours,
+  hex literals, raw z-index and one-off type sizes in `src/`, with a documented exception
+  list.
 - `--dp-good-text`, `--dp-warn-text`, `--dp-bad-text` — a second step for the status
   triad, for text. The existing `--dp-*` tokens keep their meaning as the solid step
   for fills, borders and icons.
@@ -54,6 +67,12 @@ Nothing has been tagged or released yet; everything below is on `main`.
   `forwardRef` specifically.
 - `Toast` now paints from tokens, announces (`role="alert"` for errors, `role="status"`
   otherwise), labels its close button, and clears its timers on unmount.
+- Every overlay moved off `z-50` onto the ladder: dialog, alert dialog and sheet split
+  into backdrop and modal rungs; dropdown and select onto popover, so a menu opened inside
+  a dialog clears it; tooltip and toast above both.
+- The five one-off type sizes (`text-[10px]`, `[11px]`, `[13px]`, `[0.8rem]`) collapsed
+  onto `text-2xs` / `text-xs`. `text-[0.9em]` on inline code stays — it is sized against
+  its parent.
 - The Markdown parser's doc comment was rewritten — it carried internal product
   narrative that meant nothing outside the original codebase.
 
@@ -68,6 +87,8 @@ Nothing has been tagged or released yet; everything below is on `main`.
   ids with `Math.random().toString(36).substring(7)`, which can collide.
 - `tokens.css` documented its own import path as `./datapond/tokens.css` while the
   README said `./tokens.css`.
+- `scripts/check-contrast.mjs` read only the first `:root` block, so a stylesheet that
+  opens `:root` twice would have been measured against the wrong half.
 
 ## [1.0.0] — 2026-08-31
 

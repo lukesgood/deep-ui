@@ -208,6 +208,16 @@ function TokensSection() {
 
 const RADII = ["sm", "md", "lg", "xl", "2xl", "3xl", "4xl"] as const
 
+const LAYERS = [
+  { name: "raised", z: 10, note: "fixed page chrome — the app sidebar" },
+  { name: "sticky", z: 30, note: "sticky headers, and the sidebar's drag rail" },
+  { name: "backdrop", z: 40, note: "the dim behind a modal" },
+  { name: "modal", z: 50, note: "dialog, alert dialog, sheet" },
+  { name: "popover", z: 60, note: "dropdown, select — must open above a modal" },
+  { name: "tooltip", z: 70, note: "sits above whatever it describes, anywhere" },
+  { name: "toast", z: 80, note: "confirms what you just did; nothing covers it" },
+] as const
+
 function FoundationsSection() {
   return (
     <Grid>
@@ -242,7 +252,23 @@ function FoundationsSection() {
           </p>
         </div>
       </Panel>
-      <Panel title="Numerals and fonts" note="`.dp-num` switches on tabular figures so columns of numbers line up. Fonts fall back to a system stack until you wire your own.">
+      <Panel
+        title="Stacking order"
+        note="Every overlay used to sit at z-50, so what covered what came down to DOM order. Reach these with z-[var(--dp-z-modal)] — Tailwind v4 has no z-index theme namespace."
+      >
+        <ul className="space-y-1">
+          {LAYERS.map((l) => (
+            <li key={l.name} className="flex items-baseline gap-3 text-xs">
+              <code className="dp-num w-8 shrink-0 text-right font-mono text-muted-foreground">
+                {l.z}
+              </code>
+              <code className="w-32 shrink-0 font-mono">--dp-z-{l.name}</code>
+              <span className="text-muted-foreground">{l.note}</span>
+            </li>
+          ))}
+        </ul>
+      </Panel>
+      <Panel title="Numerals and fonts" note="The .dp-num class switches on tabular figures so columns of numbers line up. Fonts fall back to a system stack until you wire your own.">
         <div className="space-y-3">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -421,7 +447,7 @@ function DataSection() {
       </Panel>
 
       <Grid>
-        <Panel title="Tabs" note="Two list variants: the filled default, and `line`.">
+        <Panel title="Tabs" note="Two list variants: the filled default, and the line variant.">
           <div className="space-y-4">
             <Tabs defaultValue="schema">
               <TabsList>
@@ -521,7 +547,7 @@ function OverlaysSection() {
         </div>
       </Panel>
 
-      <Panel title="Alert dialog and confirm" note="`useConfirm()` is the promise-based replacement for window.confirm().">
+      <Panel title="Alert dialog and confirm" note="useConfirm() is the promise-based replacement for window.confirm().">
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => setAlertOpen(true)}>
             Alert dialog
@@ -702,7 +728,7 @@ export const SECTIONS = [
     id: "foundations",
     title: "Foundations",
     icon: "Layers",
-    note: "Radius, elevation, the gradient, and the numeral and font tokens.",
+    note: "Radius, elevation, the gradient, the stacking ladder, and the numeral and font tokens.",
     render: FoundationsSection,
   },
   {

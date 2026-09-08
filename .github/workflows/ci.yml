@@ -41,6 +41,9 @@ jobs:
       - name: Parser tests
         run: npm test
 
+      - name: Token discipline
+        run: npm run check:tokens
+
       - name: Palette contrast
         run: npm run check:contrast
 

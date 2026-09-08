@@ -65,7 +65,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="region"
         aria-label="Notifications"
-        className="fixed bottom-4 right-4 z-50 flex flex-col gap-2"
+        className="fixed bottom-4 right-4 z-[var(--dp-z-toast)] flex flex-col gap-2"
       >
         {toasts.map((t) => {
           const { icon: Icon, color } = TONE[t.type]
