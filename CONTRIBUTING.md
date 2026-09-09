@@ -139,6 +139,11 @@ watch it go red before you commit.
 `prefers-reduced-motion` is honoured globally in `tokens.css`, so you do not need to
 guard individual animations — but do not fight it either.
 
+The palette is measured and the semantics are asserted; what a screen reader actually says
+is neither. The README's Accessibility section lists four findings that are already
+confirmed from the source — the tooltip is not announced at all — and what an audit would
+still have to cover. If you are touching one of those components, that list is the brief.
+
 The palette is measured. The components are not audited. Keyboard operability and
 labelling are expected of anything new, but nobody has put this through a screen
 reader, so please do not describe it as compliant. If you find a real a11y bug, that

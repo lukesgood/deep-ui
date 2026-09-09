@@ -394,6 +394,53 @@ announce (errors as `role="alert"`, the rest as `role="status"`), and
 `prefers-reduced-motion` is honoured, but **none of this has been through a screen-reader
 audit.** Treat the components as a good starting point, not a compliance claim.
 
+### What an audit still has to cover
+
+A script can measure contrast and a test can assert that an attribute is present. Neither
+tells you what a screen reader actually *says* — whether an announcement arrives once or
+forty times, whether focus lands somewhere sensible, whether the order things are read in
+matches the order they appear.
+
+**Already found, no screen reader required.** These are visible in the source and are
+fixable without an audit:
+
+| | |
+|---|---|
+| **Tooltip content is never announced** | The trigger gets no `aria-describedby`, and the popup has neither an `id` nor `role="tooltip"`. Anything a Tooltip says must also exist somewhere else. (Collapsed sidebar buttons are *not* affected — their label is clipped by `overflow`, not removed from the accessibility tree, so they keep their name.) |
+| **Markdown headings are not headings** | `components/ui/markdown.tsx` renders `#` as a styled `<p>`. A long answer therefore has no structure to navigate by. |
+| **Skeleton is exposed as empty content** | No `aria-hidden` on the placeholder, and nothing sets `aria-busy` on the region being loaded. |
+| **Table headers carry no `scope`** | Implicit scope covers a simple grid; anything with row headers needs `scope` set by the caller, and nothing says so. |
+
+**Needs a person with a screen reader.** Ordered by how badly it goes wrong when it is
+wrong:
+
+- **Live regions.** Does a streaming answer in `Conversation` announce once when it
+  settles, or on every token? Does a `Toast` interrupt appropriately — errors as `alert`,
+  the rest as `status` — and does a burst of three announce as three? Does
+  `ConversationPending` say anything useful?
+- **Focus.** Dialog, AlertDialog and Sheet: is focus trapped, and does it return to the
+  trigger on close? Does the sidebar's mobile Sheet return focus to the trigger? Does
+  Combobox keep focus in the input while `aria-activedescendant` moves?
+- **Naming.** Every icon-only control: `SidebarTrigger`, `ComposerSubmit`,
+  `ConversationActions`, the toast dismiss, the pagination arrows. Does `OtpField`
+  announce which box you are in?
+- **State.** Accordion and Collapsible expanded/collapsed; Toggle and ToggleGroup pressed;
+  the sidebar's own collapsed state; which Tab is selected and whether the panel is
+  announced on switch.
+- **Forms.** Does a `Field` error reach the reader on submit, and is the description read
+  before it? Is a `Fieldset` legend announced when focus enters the group? Does
+  `PasswordInput`'s toggle read its pressed state?
+- **Reading order.** In `templates/assistant-shell`, does the docked panel come after the
+  main content or interrupt it? Does the citation list read in a sensible place relative
+  to the answer that cites it?
+
+**Coverage that would count as done.** NVDA and JAWS on Windows (Chrome and Firefox),
+VoiceOver on macOS (Safari) and iOS, TalkBack on Android. A finding on one is a finding;
+agreement across all four is not required to act.
+
+Findings are welcome as issues — including "this is fine, I checked", which is worth
+recording so nobody checks it twice.
+
 The excluded tokens are listed in `scripts/check-contrast.mjs` with a reason each, so the
 exclusions are as reviewable as the assertions.
 
