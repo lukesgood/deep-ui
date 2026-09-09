@@ -16,9 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # 22.18 is the floor: below it `node --test` cannot read the .ts test
-        # files without a transpile step, and this repo deliberately has none.
-        node: [22, 24]
+        node: [20, 22, 24]
 
     steps:
       - uses: actions/checkout@v5
@@ -38,7 +36,7 @@ jobs:
       - name: Typecheck the demo
         run: npm run typecheck -w deep-ui-demo
 
-      - name: Parser tests
+      - name: Tests
         run: npm test
 
       - name: Token discipline

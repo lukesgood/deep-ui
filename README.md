@@ -15,19 +15,25 @@ Originally extracted from [DataPond](https://github.com/lukesgood/datapond) and 
 taken further — see [Differences from DataPond's copy](#differences-from-dataponds-copy).
 The `dp` in `--dp-*` and `.dp-*` is this system's name, not that one's.
 
-| Light | Dark |
-|---|---|
-| ![The gallery in the light theme](docs/gallery-light.jpg) | ![The gallery in the dark theme](docs/gallery-dark.jpg) |
+**[See the gallery →](https://lukesgood.github.io/deep-ui/)**
 
-Both are the same page — the theme is one class on `<html>`.
+| | |
+|---|---|
+| ![Tokens, light theme](docs/gallery-light.jpg) | ![Tokens, dark theme](docs/gallery-dark.jpg) |
+| ![Form controls](docs/gallery-forms.jpg) | ![An assistant panel](docs/gallery-assistant.jpg) |
+
+The first two are the same page — the theme is one class on `<html>`.
 
 ---
 
 ## See it
 
-`examples/demo` is a small Vite app that renders every token and every primitive on one
-page. It imports the template through the `@/*` alias pointed at `../../src`, so nothing
-is copied: what the page shows is the source in this repo.
+The gallery renders every token and every primitive on one page:
+**[lukesgood.github.io/deep-ui](https://lukesgood.github.io/deep-ui/)**.
+
+It lives in `examples/demo` and imports the template through the `@/*` alias pointed at
+`../../src`, so nothing is copied — what the page shows is the source in this repo, and it
+cannot drift from it.
 
 ```bash
 npm install     # workspace install, covers the template and the demo
@@ -407,18 +413,21 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # the Markdown parser — node --test, no transpile step
+npm test                # 48 tests — the parser, the scroll logic, and the components
 npm run check:tokens    # no literal colours, no raw z-index, no one-off type sizes
 npm run check:contrast  # the palette, measured against tokens.css
 npm run demo:build      # builds examples/demo — catches what typecheck can't
 ```
 
-Needs Node **22.18+**: the tests are `.ts` files run directly by `node --test` using
-native type stripping. CI runs the same steps on Node 22 and 24.
+CI runs the same steps on Node 20, 22 and 24, and deploys the gallery to Pages on every
+push to `main`.
 
-The React components have no tests. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
-actually enforced, and [CHANGELOG.md](./CHANGELOG.md) — which, for a copy-in template, is
-the only upgrade path there is.
+The component tests are aimed at the failures this repo has actually had rather than at
+coverage: that every overlay opens without taking the page down with it, that a `Field`
+really does associate its label, hint and error with the control, that the composer does
+not send mid-IME-composition. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
+enforced, and [CHANGELOG.md](./CHANGELOG.md) — which, for a copy-in template, is the only
+upgrade path there is.
 
 ---
 

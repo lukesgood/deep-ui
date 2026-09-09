@@ -24,9 +24,9 @@ npm install     # workspace install — covers the template and the demo
 npm run demo    # the gallery, at http://localhost:5173
 ```
 
-Node **22.18 or newer**. The tests are `.ts` files run directly by `node --test`
-using native type stripping; below that version they need a transpile step, and this
-repo deliberately does not have one.
+Node **20.19 or newer**. The template itself still has no build step — that is the
+point of it — but the repo has a test toolchain, which never reaches anyone who copies
+`src/`.
 
 ## Before you open a PR
 
@@ -112,13 +112,27 @@ prop — that is how `ErrorBox` got its `hint`.
 
 ## Testing
 
-`src/lib/markdown.ts` is pure and has real tests. If you touch the parser, add a case
-— especially for anything about what is *not* interpreted. Links are deliberately
-never turned into anchors, and fence content is never parsed; both are security
-properties, not style choices, and both should stay covered.
+`npm test` runs Vitest over `test/`, in a happy-dom environment, through the same `@/*`
+alias a consuming app uses — so a broken internal import fails here rather than in
+someone else's project.
 
-The React components have no tests yet. A PR that adds them is welcome; a PR that
-changes a component is not blocked on it.
+The suite is aimed at the failures this repo has actually had, not at a coverage number:
+
+- **every overlay opens.** A `DropdownMenuLabel` outside a group throws, and a throw
+  during render unmounts the whole page. That shipped, because wiring a menu and opening
+  one are different acts. If you add an overlay, add the test that opens it.
+- **the wiring nobody can see.** `Field` associating its label, hint and error with the
+  control; `aria-invalid` on a failed field; `aria-current` on the active page; a
+  progress bar that reports no number when it has none.
+- **the rules with a reason.** The composer not sending mid-IME-composition; the reveal
+  toggle not submitting the form it sits in.
+
+`src/lib/markdown.ts` is pure and covered separately. If you touch the parser, add a case
+— especially for what is *not* interpreted. Links are never turned into anchors and fence
+content is never parsed; both are security properties, not style choices.
+
+A test that cannot fail is worth nothing. When you add one, break the thing it covers and
+watch it go red before you commit.
 
 ## Accessibility
 

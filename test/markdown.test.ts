@@ -1,4 +1,4 @@
-import { test } from "node:test"
+import { test } from "vitest"
 import assert from "node:assert/strict"
 
 import { parseBlocks, parseInline, type Block, type Inline } from "../src/lib/markdown.ts"

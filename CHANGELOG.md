@@ -14,6 +14,11 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **Component tests** (`npm test`, now Vitest + happy-dom): every overlay opens, `Field`
+  associates label/hint/error, the composer respects IME composition, the reveal toggle
+  cannot submit its form, pagination announces the current page. 48 tests total.
+- **The gallery is deployed** to <https://lukesgood.github.io/deep-ui/> on every push to
+  `main`.
 - **Fifteen more primitives**, taking the set to 49: `slider`, `number-field`,
   `checkbox-group`, `otp-field`, `password-input`, `combobox`, `toggle`, `toggle-group`,
   `toolbar`, `meter`, `context-menu`, `preview-card`, `navigation-menu`, `menubar`,
@@ -28,6 +33,9 @@ Nothing has been tagged or released yet; everything below is on `main`.
   `Citation`), plus `hooks/use-stick-to-bottom.ts`. There is no panel shell — dock it
   with `Sidebar side="right"` or float it with `Sheet`.
   **In your copy:** additive.
+- Tests moved from `node --test` to Vitest, so `.tsx` components can be tested at all —
+  Node's native type stripping does not transform JSX. The supported Node range widened
+  to 20.19+ as a result. **In your copy:** nothing; test tooling never leaves this repo.
 - `Markdown` takes an optional `citationHref`. Omit it and `[n]` renders exactly as
   before; give it one and the marker becomes a same-page anchor.
   **In your copy:** no change unless you want the links.
