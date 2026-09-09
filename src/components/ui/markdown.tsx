@@ -9,9 +9,20 @@ import { parseBlocks, type Inline } from "@/lib/markdown"
  *  a closed set of node types and each is rendered as a React element, so there is no
  *  path from model output to markup.
  */
-export function Markdown({ text, citations = false, citationHref, className = "" }: {
+export function Markdown({
+  text,
+  citations = false,
+  citationHref,
+  baseHeadingLevel = 3,
+  className = "",
+}: {
   text: string
   citations?: boolean
+  /** The heading level `#` maps to. A model's `#` is not the page's `<h1>` — it is a
+   *  heading inside whatever section is already rendering the answer — so it starts at
+   *  `<h3>` by default and each further `#` goes one deeper, clamped at `<h6>`. Raise
+   *  or lower it to sit correctly under your own document outline. */
+  baseHeadingLevel?: 1 | 2 | 3 | 4 | 5 | 6
   /** Turns each `[n]` marker into a link to the matching source. Given a function
    *  rather than a boolean so the target is the caller's to decide — `<Citations>`
    *  renders ids of the form `citation-1`, so `(n) => "#citation-" + n` pairs them.
@@ -29,8 +40,17 @@ export function Markdown({ text, citations = false, citationHref, className = ""
           </pre>
         )
         if (b.t === "h") {
+          // Real heading elements, so a long answer can be navigated by structure
+          // instead of read start to finish. The visual size stays independent of the
+          // level — inside a chat bubble an <h3> should not look like a page heading.
           const size = b.level <= 2 ? "text-sm" : "text-xs"
-          return <p key={i} className={`${size} font-semibold`}><Spans spans={b.spans} citationHref={citationHref} /></p>
+          const level = Math.min(baseHeadingLevel + b.level - 1, 6)
+          const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
+          return (
+            <Heading key={i} className={`${size} font-semibold`}>
+              <Spans spans={b.spans} citationHref={citationHref} />
+            </Heading>
+          )
         }
         if (b.t === "ul") return (
           <ul key={i} className="list-disc space-y-0.5 pl-4">

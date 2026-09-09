@@ -114,6 +114,18 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Fixed
 
+- **Four accessibility defects that did not need an audit to find.**
+  - `Tooltip` content is now announced: the popup carries `role="tooltip"` and an id,
+    and the trigger points at it with `aria-describedby` while open. Previously the
+    text reached nobody using a screen reader.
+  - `Markdown` renders `#` as a real heading (`<h3>`–`<h6>`, from the new
+    `baseHeadingLevel`, default 3) instead of a styled `<p>`, so a long answer can be
+    navigated by structure. Visuals are unchanged.
+  - `Skeleton` is `aria-hidden` — a row of grey rectangles is a picture of loading,
+    not information.
+  - `TableHead` defaults to `scope="col"`.
+  **In your copy:** re-copy those four files. `Markdown` gains an optional prop and
+  changes the element it renders for headings; nothing else moves.
 - **A menu label without a group no longer takes the page down.** `DropdownMenuLabel`
   and `ContextMenuLabel` are Base UI group labels, which throw outside a group — and a
   throw during render unmounts the whole React tree. They now supply their own group

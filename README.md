@@ -401,15 +401,20 @@ tells you what a screen reader actually *says* — whether an announcement arriv
 forty times, whether focus lands somewhere sensible, whether the order things are read in
 matches the order they appear.
 
-**Already found, no screen reader required.** These are visible in the source and are
-fixable without an audit:
+**Four findings did not need one, and are fixed.** They were visible in the source, which
+is worth saying: the parts of an audit a script can reach should be done before anyone
+spends an afternoon with a screen reader on them.
 
 | | |
 |---|---|
-| **Tooltip content is never announced** | The trigger gets no `aria-describedby`, and the popup has neither an `id` nor `role="tooltip"`. Anything a Tooltip says must also exist somewhere else. (Collapsed sidebar buttons are *not* affected — their label is clipped by `overflow`, not removed from the accessibility tree, so they keep their name.) |
-| **Markdown headings are not headings** | `components/ui/markdown.tsx` renders `#` as a styled `<p>`. A long answer therefore has no structure to navigate by. |
-| **Skeleton is exposed as empty content** | No `aria-hidden` on the placeholder, and nothing sets `aria-busy` on the region being loaded. |
-| **Table headers carry no `scope`** | Implicit scope covers a simple grid; anything with row headers needs `scope` set by the caller, and nothing says so. |
+| Tooltip content was never announced | The trigger got no `aria-describedby`, and the popup had neither an `id` nor `role="tooltip"`. Now wired, and only while open — a description pointing at an unmounted element is its own small lie. |
+| Markdown headings were not headings | `#` rendered as a styled `<p>`. Now real `<h3>`–`<h6>`, starting at `baseHeadingLevel` (default 3) because a model's `#` is a heading *inside* the answer, not the page's `<h1>`. |
+| Skeleton was exposed as empty content | Now `aria-hidden`. Say the wait is happening with `aria-busy` on the region the skeletons stand in for. |
+| Table headers carried no `scope` | `TableHead` now defaults to `scope="col"`; pass `scope="row"` on headers that label a row. |
+
+One thing checked while fixing those, because it would have made the tooltip gap severe:
+a sidebar collapsed to icons keeps its buttons' names. The label is clipped by `overflow`,
+not removed from the accessibility tree.
 
 **Needs a person with a screen reader.** Ordered by how badly it goes wrong when it is
 wrong:

@@ -1,8 +1,20 @@
 "use client"
 
+import * as React from "react"
 import { Tooltip as TooltipPrimitive } from "@base-ui/react/tooltip"
 
 import { cn } from "@/lib/utils"
+
+/** Base UI leaves the tooltip's popup unassociated with its trigger: no `id`, no
+ *  `role="tooltip"`, no `aria-describedby`. A screen reader therefore hears the
+ *  control's own name and nothing else, and whatever the tooltip was there to add is
+ *  simply lost.
+ *
+ *  This context supplies the missing wiring — one id, shared, applied to the popup
+ *  and pointed at from the trigger while the tooltip is open. It is only set while
+ *  open, because the popup unmounts when closed and a description pointing at
+ *  nothing is its own small lie. */
+const TooltipAria = React.createContext<{ id: string; open: boolean } | null>(null)
 
 function TooltipProvider({
   delay = 0,
@@ -17,12 +29,36 @@ function TooltipProvider({
   )
 }
 
-function Tooltip({ ...props }: TooltipPrimitive.Root.Props) {
-  return <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+function Tooltip({ open, defaultOpen, onOpenChange, ...props }: TooltipPrimitive.Root.Props) {
+  const id = React.useId()
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen ?? false)
+  const isOpen = open ?? uncontrolledOpen
+
+  return (
+    <TooltipAria.Provider value={React.useMemo(() => ({ id, open: isOpen }), [id, isOpen])}>
+      <TooltipPrimitive.Root
+        data-slot="tooltip"
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={(next, details) => {
+          setUncontrolledOpen(next)
+          onOpenChange?.(next, details)
+        }}
+        {...props}
+      />
+    </TooltipAria.Provider>
+  )
 }
 
 function TooltipTrigger({ ...props }: TooltipPrimitive.Trigger.Props) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
+  const aria = React.useContext(TooltipAria)
+  return (
+    <TooltipPrimitive.Trigger
+      data-slot="tooltip-trigger"
+      aria-describedby={aria?.open ? aria.id : undefined}
+      {...props}
+    />
+  )
 }
 
 function TooltipContent({
@@ -38,6 +74,7 @@ function TooltipContent({
     TooltipPrimitive.Positioner.Props,
     "align" | "alignOffset" | "side" | "sideOffset"
   >) {
+  const aria = React.useContext(TooltipAria)
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Positioner
@@ -49,6 +86,8 @@ function TooltipContent({
       >
         <TooltipPrimitive.Popup
           data-slot="tooltip-content"
+          id={aria?.id}
+          role="tooltip"
           className={cn(
             "z-[var(--dp-z-tooltip)] inline-flex w-fit max-w-xs origin-(--transform-origin) items-center gap-1.5 rounded-md bg-foreground px-3 py-1.5 text-xs text-background has-data-[slot=kbd]:pr-1.5 data-[side=bottom]:slide-in-from-top-2 data-[side=inline-end]:slide-in-from-left-2 data-[side=inline-start]:slide-in-from-right-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 **:data-[slot=kbd]:relative **:data-[slot=kbd]:isolate **:data-[slot=kbd]:z-50 **:data-[slot=kbd]:rounded-sm data-[state=delayed-open]:animate-in data-[state=delayed-open]:fade-in-0 data-[state=delayed-open]:zoom-in-95 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
             className
