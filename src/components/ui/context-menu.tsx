@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { ContextMenu as ContextMenuPrimitive } from "@base-ui/react/context-menu"
 
 import { cn } from "@/lib/utils"
@@ -59,26 +60,33 @@ function ContextMenuItem({
   )
 }
 
+/** See the note on `InDropdownMenuGroup` — same primitive, same sharp edge, blunted
+ *  the same way. */
+const InContextMenuGroup = React.createContext(false)
+
 function ContextMenuGroup({ className, ...props }: ContextMenuPrimitive.Group.Props) {
   return (
-    <ContextMenuPrimitive.Group
-      data-slot="context-menu-group"
-      className={cn(className)}
-      {...props}
-    />
+    <InContextMenuGroup.Provider value={true}>
+      <ContextMenuPrimitive.Group
+        data-slot="context-menu-group"
+        className={cn(className)}
+        {...props}
+      />
+    </InContextMenuGroup.Provider>
   )
 }
 
-/** Labels a group, and Base UI means that literally: rendering it outside a
- *  `<ContextMenuGroup>` throws and takes the whole React tree with it. */
+/** Labels the group it is in, and supplies one if it has none. */
 function ContextMenuLabel({ className, ...props }: ContextMenuPrimitive.GroupLabel.Props) {
-  return (
+  const inGroup = React.useContext(InContextMenuGroup)
+  const label = (
     <ContextMenuPrimitive.GroupLabel
       data-slot="context-menu-label"
       className={cn("px-2 py-1.5 text-xs font-medium text-muted-foreground", className)}
       {...props}
     />
   )
+  return inGroup ? label : <ContextMenuPrimitive.Group>{label}</ContextMenuPrimitive.Group>
 }
 
 function ContextMenuSeparator({ className, ...props }: ContextMenuPrimitive.Separator.Props) {

@@ -46,26 +46,40 @@ test("a menu with a label inside a group opens and renders its items", () => {
   expect(screen.getByText("Rename")).toBeTruthy()
 })
 
-test("a menu label outside a group throws, which is why the wrapper is not optional", () => {
-  // Documenting the sharp edge rather than pretending it is gone: Base UI enforces
-  // the relationship, and this asserts the failure is loud instead of silent.
-  const quiet = () => {}
-  const originalError = console.error
-  console.error = quiet
-  try {
-    expect(() =>
-      render(
-        <DropdownMenu defaultOpen>
-          <DropdownMenuTrigger render={<Button />}>Actions</DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuLabel>events_raw</DropdownMenuLabel>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )
-    ).toThrow(/MenuGroupContext is missing/)
-  } finally {
-    console.error = originalError
-  }
+test("a menu label without a group supplies its own instead of taking the page down", () => {
+  // This used to throw, and a throw during render unmounts the whole React tree —
+  // one menu with a label blanked the entire page. The label now wraps itself in a
+  // group when it has none, so the mistake is not available to make.
+  render(
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button />}>Actions</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>events_raw</DropdownMenuLabel>
+        <DropdownMenuItem>Rename</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+  fireEvent.click(screen.getByText("Actions"))
+  expect(screen.getByText("events_raw")).toBeTruthy()
+  expect(screen.getByText("Rename")).toBeTruthy()
+})
+
+test("a label inside a group does not nest a second one", () => {
+  render(
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<Button />}>Actions</DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>events_raw</DropdownMenuLabel>
+          <DropdownMenuItem>Rename</DropdownMenuItem>
+        </DropdownMenuGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+  fireEvent.click(screen.getByText("Actions"))
+  const label = screen.getByText("events_raw")
+  const groups = label.closest('[role="group"]')?.querySelectorAll('[role="group"]') ?? []
+  expect(groups.length).toBe(0)
 })
 
 /* ── every overlay opens ──────────────────────────────────────────────────── */

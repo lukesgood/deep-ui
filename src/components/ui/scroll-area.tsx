@@ -4,9 +4,17 @@ import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
 
 import { cn } from "@/lib/utils"
 
-/** A scroll container that keeps a visible, styled scrollbar instead of the
- *  platform's — which on macOS hides itself until you scroll, so a pane that can
- *  scroll looks exactly like one that cannot until someone tries.
+/** A scroll container with the system's own scrollbar rather than the platform's.
+ *
+ *  What that buys, precisely: it looks the same on every OS, and it appears on
+ *  **hover** — where the macOS overlay scrollbar appears only once you are already
+ *  scrolling, which is too late to answer "can this pane scroll?". It is still
+ *  hidden at rest; a permanently visible rail beside every list is its own noise.
+ *
+ *  Base UI unmounts the scrollbar entirely while the content does not overflow, and
+ *  re-measures on scroll. That is right for a pane whose content is there from the
+ *  start, and wrong for one that *grows* into being scrollable — see the note in
+ *  components/ui/conversation.tsx before reaching for `keepMounted`.
  *
  *  The viewport stays a real scrolling element, so keyboard paging, wheel and
  *  scroll-into-view all behave normally. */

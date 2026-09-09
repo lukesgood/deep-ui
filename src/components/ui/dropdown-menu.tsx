@@ -49,19 +49,23 @@ function DropdownMenuContent({
   )
 }
 
+/** Tracks whether a label already has a group around it. Base UI's `Menu.GroupLabel`
+ *  throws outside a `Menu.Group`, and a throw during render unmounts the whole React
+ *  tree — a menu with a label used to take the entire page down with it. Rather than
+ *  document that and hope, the label supplies its own group when it does not have
+ *  one, so the mistake is not available to make. */
+const InDropdownMenuGroup = React.createContext(false)
+
 function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
-  return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
+  return (
+    <InDropdownMenuGroup.Provider value={true}>
+      <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
+    </InDropdownMenuGroup.Provider>
+  )
 }
 
-/** Labels a group, and Base UI means that literally: this is `Menu.GroupLabel`, and
- *  rendering it outside a `<DropdownMenuGroup>` throws — which unmounts the whole
- *  React tree, not just the menu. Always:
- *
- *      <DropdownMenuGroup>
- *        <DropdownMenuLabel>events_raw</DropdownMenuLabel>
- *        <DropdownMenuItem>…</DropdownMenuItem>
- *      </DropdownMenuGroup>
- */
+/** Labels the group it is in. Wrap related items in `<DropdownMenuGroup>` so the
+ *  label names them; used on its own it still works, labelling only itself. */
 function DropdownMenuLabel({
   className,
   inset,
@@ -69,7 +73,8 @@ function DropdownMenuLabel({
 }: MenuPrimitive.GroupLabel.Props & {
   inset?: boolean
 }) {
-  return (
+  const inGroup = React.useContext(InDropdownMenuGroup)
+  const label = (
     <MenuPrimitive.GroupLabel
       data-slot="dropdown-menu-label"
       data-inset={inset}
@@ -80,6 +85,7 @@ function DropdownMenuLabel({
       {...props}
     />
   )
+  return inGroup ? label : <MenuPrimitive.Group>{label}</MenuPrimitive.Group>
 }
 
 function DropdownMenuItem({

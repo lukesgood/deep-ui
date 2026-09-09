@@ -105,9 +105,11 @@ const TEXT = [
   "--dp-good-text", "--dp-warn-text", "--dp-bad-text", "--dp-managed",
 ]
 
-/** Tokens used as shapes — fills, borders, icons, the focus ring. AA non-text. */
+/** Tokens used as shapes — fills, borders, icons, the focus ring. AA non-text.
+ *  `--input` is in here because a field's edge is what identifies the field: WCAG
+ *  1.4.11 covers it, where a decorative rule between sections is not covered. */
 const SOLID = [
-  "--dp-good", "--dp-warn", "--dp-bad", "--dp-aqua", "--ring",
+  "--dp-good", "--dp-warn", "--dp-bad", "--dp-aqua", "--ring", "--input",
   "--chart-1", "--chart-2", "--chart-3", "--chart-4", "--chart-5",
 ]
 
@@ -126,8 +128,7 @@ const ON_FILL = [
 /** Deliberately not asserted. See the "What it does not guarantee" note in the
  *  README: raising these to 3:1 is a design change, not a value change. */
 const EXCLUDED = {
-  "--border": "hairline weight is a design choice — see README, Accessibility",
-  "--input": "field-edge weight is a design choice — see README, Accessibility",
+  "--border": "draws structure between sections rather than identifying a control, so 1.4.11 does not reach it",
   "--sidebar-border": "same as --border",
   "--sidebar-ring": "duplicates --ring, which is asserted",
 }

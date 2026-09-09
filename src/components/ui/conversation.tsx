@@ -18,11 +18,20 @@ import { cn } from "@/lib/utils"
  *    read out when it settles. Without it a screen-reader user gets silence and has
  *    to go hunting for whether anything happened.
  *
- *  A seam worth knowing about: this scrolls natively rather than through
- *  `<ScrollArea>`, because sticking to the bottom needs a ref to the element that
- *  actually scrolls. The cost is that the scrollbar here is the platform's, so on
- *  macOS it hides itself between scrolls while the rest of the system's panes keep
- *  a visible one.
+ *  A seam, left open on purpose: this scrolls natively rather than through
+ *  `<ScrollArea>`, so its scrollbar is the platform's while the rest of the system's
+ *  panes use ours. Routing it through ScrollArea was tried and measured worse, both
+ *  ways round:
+ *
+ *  - as-is, Base UI unmounts the scrollbar while the content fits and only
+ *    re-measures on scroll. A log that grows into being scrollable therefore has no
+ *    scrollbar at all until the reader scrolls it by some other means.
+ *  - with `keepMounted`, it renders before it has measured: a 16px thumb in a 328px
+ *    track on a log that does not overflow, which tells the reader there is a great
+ *    deal more to see when there is nothing.
+ *
+ *  The platform scrollbar is honest about both. Revisit if Base UI grows a way to
+ *  re-measure on content growth.
  */
 function Conversation({
   className,

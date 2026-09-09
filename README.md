@@ -384,17 +384,15 @@ The checker reads the real values out of `tokens.css`, and it **fails on any tok
 cannot parse** rather than skipping it — a checker that quietly ignores what it does not
 understand reports green for the wrong reason. CI runs it on every push.
 
-**What it does not guarantee.** Two things are known gaps, both inherited from shadcn's
-defaults, and both left alone because closing them changes the look rather than a value:
+`--input` is in that set: a field's edge is the only thing that says where the field is,
+so WCAG 1.4.11 covers it and it clears 3:1. `--border` is not, and is deliberately left
+soft — it draws structure between sections rather than identifying a control, which is
+outside what 1.4.11 asks for.
 
-- `--border` and `--input` sit near 1.3:1 against their surfaces. Where a field's only
-  boundary is that border, WCAG 1.4.11 wants 3:1, which in practice means a much heavier
-  edge than the soft look the system is going for. If you need to meet 1.4.11 strictly,
-  darken `--input`.
-- The components are keyboard-operable and labelled, toasts announce (errors as
-  `role="alert"`, the rest as `role="status"`), and `prefers-reduced-motion` is honoured,
-  but **none of this has been through a screen-reader audit.** Treat the components as a
-  good starting point, not a compliance claim.
+**What it does not guarantee.** The components are keyboard-operable and labelled, toasts
+announce (errors as `role="alert"`, the rest as `role="status"`), and
+`prefers-reduced-motion` is honoured, but **none of this has been through a screen-reader
+audit.** Treat the components as a good starting point, not a compliance claim.
 
 The excluded tokens are listed in `scripts/check-contrast.mjs` with a reason each, so the
 exclusions are as reviewable as the assertions.

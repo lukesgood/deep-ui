@@ -114,6 +114,18 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Fixed
 
+- **A menu label without a group no longer takes the page down.** `DropdownMenuLabel`
+  and `ContextMenuLabel` are Base UI group labels, which throw outside a group — and a
+  throw during render unmounts the whole React tree. They now supply their own group
+  when they have none, so the mistake is not available to make. Previously this was
+  only documented in a comment.
+  **In your copy:** re-copy `dropdown-menu.tsx` and `context-menu.tsx`; existing
+  `<DropdownMenuGroup>` wrapping stays correct and does not nest.
+- **`--input` now clears 3:1** (light `#d3e0e3` → `#628f9a`, dark alpha `0.13` → `0.335`),
+  and the contrast checker asserts it rather than excusing it. A field's border is what
+  identifies the field, which is what WCAG 1.4.11 is about. `--border` is unchanged: it
+  draws structure, not controls.
+  **In your copy:** token values, so re-copying `tokens.css` is the whole change.
 - The demo's Tailwind scan covered `src/` but not `templates/`, so a class used only
   in a template was tree-shaken: the sign-in card rendered with no padding at all.
   Both trees are scanned now, and `check-tokens` lints both too.

@@ -137,7 +137,10 @@
   --accent-foreground: #0e1c22;
   --destructive: #bd183c;
   --border: #dae5e8;
-  --input: #d3e0e3;
+  /* A field's edge is the only thing that says where the field is, so WCAG 1.4.11
+     asks 3:1 of it — unlike --border, which draws structure rather than identifying
+     a control and is deliberately left soft. */
+  --input: #628f9a;
   --ring: #066c7d;
   /* Data-viz categorical ramp. Series are told apart by HUE, not lightness, so
      the five are spaced at least 53 degrees apart — the old ramp had two teals
@@ -201,7 +204,7 @@
   --accent-foreground: #e7f1f3;
   --destructive: #fb7185;
   --border: rgb(255 255 255 / 0.08);
-  --input: rgb(255 255 255 / 0.13);
+  --input: rgb(255 255 255 / 0.335);  /* 3:1 against every dark surface */
   --ring: #22c3d6;
   /* the same five hues, lifted into the brightness this ground wants */
   --chart-1: #23bcd7;
