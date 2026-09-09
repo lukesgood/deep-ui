@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
-  ArrowUpRight, CircleAlert, Copy, Database, Inbox, MoreHorizontal, Pencil,
-  RefreshCw, Trash2, TriangleAlert,
+  ArrowUpRight, Bold, CircleAlert, Copy, Database, Inbox, Italic, List,
+  MoreHorizontal, Pencil, RefreshCw, Trash2, TriangleAlert, Underline,
 } from "lucide-react"
 
 import {
@@ -19,6 +19,7 @@ import {
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { CheckboxGroup } from "@/components/ui/checkbox-group"
 import { Citation, Citations } from "@/components/ui/citations"
 import {
   Composer, ComposerInput, ComposerSubmit,
@@ -34,9 +35,17 @@ import {
   DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
-  DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList,
+} from "@/components/ui/combobox"
+import {
+  ContextMenu, ContextMenuContent, ContextMenuGroup, ContextMenuItem,
+  ContextMenuLabel, ContextMenuSeparator, ContextMenuTrigger,
+} from "@/components/ui/context-menu"
 import { EmptyState, ErrorBox } from "@/components/ui/error-box"
 import {
   Field, FieldControl, FieldDescription, FieldError, FieldLabel, Fieldset,
@@ -45,14 +54,31 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Markdown } from "@/components/ui/markdown"
+import { Menubar } from "@/components/ui/menubar"
+import { Meter, MeterLabel, MeterTrack, MeterValue } from "@/components/ui/meter"
+import {
+  NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink,
+  NavigationMenuList, NavigationMenuTrigger, NavigationMenuViewport,
+} from "@/components/ui/navigation-menu"
+import { NumberField, NumberFieldGroup } from "@/components/ui/number-field"
+import { OtpField } from "@/components/ui/otp-field"
+import {
+  Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink,
+  PaginationNext, PaginationPrevious,
+} from "@/components/ui/pagination"
+import { PasswordInput } from "@/components/ui/password-input"
 import {
   Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger,
 } from "@/components/ui/popover"
 import {
   Progress, ProgressLabel, ProgressTrack, ProgressValue,
 } from "@/components/ui/progress"
+import {
+  PreviewCard, PreviewCardContent, PreviewCardTrigger,
+} from "@/components/ui/preview-card"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Slider, SliderLabel, SliderTrack, SliderValue } from "@/components/ui/slider"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
@@ -67,6 +93,11 @@ import {
 } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { Toggle } from "@/components/ui/toggle"
+import { ToggleGroup } from "@/components/ui/toggle-group"
+import {
+  Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator,
+} from "@/components/ui/toolbar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useConfirm } from "@/lib/confirm"
 import { useToast } from "@/lib/toast"
@@ -397,6 +428,30 @@ function ControlsSection() {
           </div>
         </Panel>
 
+        <Panel title="Toggle, ToggleGroup, Toolbar" note="A toggle changes how something is shown right now (aria-pressed); a switch sets a value that gets saved. Groups and toolbars are one tab stop with arrow keys inside, not a tab stop per button.">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <Toggle aria-label="Bold"><Bold /></Toggle>
+              <Toggle variant="outline" aria-label="Italic"><Italic /></Toggle>
+            </div>
+            <ToggleGroup defaultValue={["bold"]} multiple>
+              <Toggle value="bold" aria-label="Bold"><Bold /></Toggle>
+              <Toggle value="italic" aria-label="Italic"><Italic /></Toggle>
+              <Toggle value="underline" aria-label="Underline"><Underline /></Toggle>
+            </ToggleGroup>
+            <Toolbar>
+              <ToolbarGroup>
+                <ToolbarButton aria-label="Bold"><Bold /></ToolbarButton>
+                <ToolbarButton aria-label="Italic"><Italic /></ToolbarButton>
+              </ToolbarGroup>
+              <ToolbarSeparator />
+              <ToolbarGroup>
+                <ToolbarButton aria-label="List"><List /></ToolbarButton>
+              </ToolbarGroup>
+            </Toolbar>
+          </div>
+        </Panel>
+
         <Panel title="Avatar and Progress" note="The avatar falls back on its own when the image fails; progress reports its number to assistive tech, and `value={null}` says indeterminate instead of inventing a percentage.">
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -444,9 +499,15 @@ const TIERS = [
   { value: "enterprise", label: "Enterprise", hint: "self-hosted, audit log" },
 ] as const
 
+const REGIONS = [
+  "eu-west-1", "eu-central-1", "us-east-1", "us-east-2", "us-west-2",
+  "ap-northeast-1", "ap-northeast-2", "ap-southeast-1", "sa-east-1",
+]
+
 function FormsSection() {
   const { toast } = useToast()
   const [tier, setTier] = React.useState<unknown>("team")
+  const [retention, setRetention] = React.useState<number | readonly number[]>(90)
 
   return (
     <Grid>
@@ -486,6 +547,71 @@ function FormsSection() {
             <Button type="submit" size="sm">Create dataset</Button>
           </div>
         </Form>
+      </Panel>
+
+      <Panel title="Combobox" note="A Select you can type into — for lists long enough that scanning them is work. Always render an empty state: a popup that silently blanks reads as broken, not as no matches.">
+        <Combobox items={REGIONS}>
+          <ComboboxInput placeholder="Search regions…" aria-label="Region" />
+          <ComboboxContent>
+            <ComboboxEmpty>No region matches that.</ComboboxEmpty>
+            <ComboboxList>
+              {(region: string) => (
+                <ComboboxItem key={region} value={region}>
+                  {region}
+                </ComboboxItem>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </Panel>
+
+      <Panel title="Slider and NumberField" note="The slider's hit area is padded well past the 6px rail. The number field parses with Intl.NumberFormat, so a locale that groups with a dot does not become NaN.">
+        <div className="space-y-4">
+          <Slider value={retention} onValueChange={setRetention} min={1} max={365}>
+            <div className="flex items-baseline justify-between">
+              <SliderLabel>Retention</SliderLabel>
+              <SliderValue />
+            </div>
+            <SliderTrack />
+          </Slider>
+          <div className="space-y-1.5">
+            <span className="text-sm font-medium">Parallel workers</span>
+            <NumberField defaultValue={4} min={1} max={64}>
+              <NumberFieldGroup />
+            </NumberField>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel title="Password and one-time code" note="Reveal is a toggle button with a changing label and aria-pressed, not an icon whose meaning only sighted users infer. Paste is never blocked — blocking it breaks password managers.">
+        <div className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="pw">Password</Label>
+            <PasswordInput id="pw" autoComplete="new-password" placeholder="At least 12 characters" />
+          </div>
+          <div className="space-y-1.5">
+            <span className="block text-sm font-medium">Verification code</span>
+            <OtpField length={6} />
+            <p className="text-xs text-muted-foreground">
+              One value underneath, so a pasted code fills every box.
+            </p>
+          </div>
+        </div>
+      </Panel>
+
+      <Panel title="CheckboxGroup" note="Holds the value for a set, and drives the parent's indeterminate state from its children.">
+        <CheckboxGroup defaultValue={["compaction"]}>
+          {[
+            { name: "compaction", label: "Nightly compaction" },
+            { name: "retention", label: "Retention sweep" },
+            { name: "replication", label: "Cross-region replication" },
+          ].map((o) => (
+            <label key={o.name} className="flex cursor-pointer items-center gap-2 text-sm">
+              <Checkbox name={o.name} />
+              {o.label}
+            </label>
+          ))}
+        </CheckboxGroup>
       </Panel>
 
       <Panel
@@ -557,15 +683,17 @@ function DataSection() {
                       <MoreHorizontal />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>{r.name}</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem>
-                        <Pencil /> Rename
-                        <DropdownMenuShortcut>⌘R</DropdownMenuShortcut>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem variant="destructive">
-                        <Trash2 /> Delete
-                      </DropdownMenuItem>
+                      <DropdownMenuGroup>
+                        <DropdownMenuLabel>{r.name}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem>
+                          <Pencil /> Rename
+                          <DropdownMenuShortcut>⌘R</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive">
+                          <Trash2 /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
@@ -600,6 +728,29 @@ function DataSection() {
                 <TabsTrigger value="b">Variant</TabsTrigger>
               </TabsList>
             </Tabs>
+          </div>
+        </Panel>
+
+        <Panel title="Meter and Pagination" note="A meter is a reading that sits there; Progress is a task heading for done. They carry different ARIA roles. Pagination is a labelled nav where aria-current=page — not the highlight — says where you are.">
+          <div className="space-y-4">
+            <Meter value={71} max={100}>
+              <div className="flex items-baseline justify-between">
+                <MeterLabel className="text-xs">Storage quota</MeterLabel>
+                <MeterValue />
+              </div>
+              <MeterTrack />
+            </Meter>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
+                <PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink href="#" isActive>2</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink href="#">3</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationEllipsis /></PaginationItem>
+                <PaginationItem><PaginationLink href="#">9</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationNext href="#" /></PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         </Panel>
 
@@ -772,25 +923,101 @@ function OverlaysSection() {
         </Popover>
       </Panel>
 
+      <Panel title="Context menu and Preview card" note="A right-click menu is a shortcut, never the only route — a touch or keyboard user may never open one. A preview card opens on focus as well as hover, and holds real content, unlike a tooltip.">
+        <div className="space-y-3">
+          <ContextMenu>
+            <ContextMenuTrigger className="grid h-16 place-items-center rounded-lg border border-dashed text-xs text-muted-foreground">
+              Right-click here
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+              <ContextMenuGroup>
+                <ContextMenuLabel>events_raw</ContextMenuLabel>
+                <ContextMenuSeparator />
+                <ContextMenuItem><Copy /> Duplicate</ContextMenuItem>
+                <ContextMenuItem><Pencil /> Rename</ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem variant="destructive"><Trash2 /> Delete</ContextMenuItem>
+              </ContextMenuGroup>
+            </ContextMenuContent>
+          </ContextMenu>
+          <PreviewCard>
+            <PreviewCardTrigger
+              render={<button type="button" className="font-mono text-sm text-primary underline underline-offset-4" />}
+            >
+              sessions_hourly
+            </PreviewCardTrigger>
+            <PreviewCardContent>
+              <p className="font-mono text-xs font-medium">sessions_hourly</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Rolled up from events_raw every hour. 8 columns, partitioned by day.
+              </p>
+              <p className="dp-num mt-2 text-xs text-muted-foreground">94,318 rows</p>
+            </PreviewCardContent>
+          </PreviewCard>
+        </div>
+      </Panel>
+
+      <Panel title="Navigation menu and Menubar" note="For an app shell the sidebar is almost always the better answer — a navigation menu hides its destinations behind an interaction. This is the marketing-site shape.">
+        <div className="space-y-3">
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Product</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <NavigationMenuLink href="#overlays">Ponds</NavigationMenuLink>
+                  <NavigationMenuLink href="#overlays">Pipelines</NavigationMenuLink>
+                  <NavigationMenuLink href="#overlays">Warehouses</NavigationMenuLink>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Docs</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <NavigationMenuLink href="#tokens">Tokens</NavigationMenuLink>
+                  <NavigationMenuLink href="#forms">Forms</NavigationMenuLink>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+            <NavigationMenuViewport />
+          </NavigationMenu>
+          <Menubar>
+            {["File", "Edit", "View"].map((label) => (
+              <DropdownMenu key={label}>
+                <DropdownMenuTrigger
+                  render={<Button variant="ghost" size="sm" className="font-normal" />}
+                >
+                  {label}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem>New dataset</DropdownMenuItem>
+                  <DropdownMenuItem>Import…</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ))}
+          </Menubar>
+        </div>
+      </Panel>
+
       <Panel title="Dropdown menu">
         <DropdownMenu>
           <DropdownMenuTrigger render={<Button variant="outline" size="sm" />}>
             Actions <MoreHorizontal />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel>events_raw</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Copy /> Duplicate
-              <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Pencil /> Rename
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">
-              <Trash2 /> Delete
-            </DropdownMenuItem>
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>events_raw</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Copy /> Duplicate
+                <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Pencil /> Rename
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive">
+                <Trash2 /> Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </Panel>

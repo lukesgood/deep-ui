@@ -14,6 +14,12 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **Fifteen more primitives**, taking the set to 49: `slider`, `number-field`,
+  `checkbox-group`, `otp-field`, `password-input`, `combobox`, `toggle`, `toggle-group`,
+  `toolbar`, `meter`, `context-menu`, `preview-card`, `navigation-menu`, `menubar`,
+  `pagination`. All but `pagination` wrap Base UI; `pagination` has no counterpart there
+  because there is no behaviour to abstract, only semantics to get right.
+  **In your copy:** additive.
 - **An assistant panel's missing half.** `markdown.tsx` rendered model output and
   marked citations, but nothing held a conversation, took a prompt, or showed the
   sources a `[n]` pointed at. Now `conversation` (`Conversation`,
@@ -97,6 +103,16 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Fixed
 
+- **`DropdownMenuLabel` crashed the whole app when used without a `DropdownMenuGroup`.**
+  It is Base UI's `Menu.GroupLabel`, which throws outside a group — and a throw during
+  render unmounts the entire React tree, not just the menu. Present since the original
+  extraction; found by opening every menu in the gallery rather than trusting that it
+  rendered.
+  **In your copy:** wrap the label and its items in `<DropdownMenuGroup>`. Both
+  components now say so in a comment.
+- `Collapsible` was a bare re-export with no `data-slot`, the last file outside the
+  convention, so `has-data-[slot=…]` selectors missed it. Its panel now animates its
+  height like `Accordion` does.
 - `Skeleton` was filled with a hardcoded `bg-slate-800/50`, which rendered as a dark
   block in the light theme. Now `bg-foreground/10`, which reads on any surface in
   either theme.

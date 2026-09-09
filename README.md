@@ -4,7 +4,7 @@
 rather than left at a default grey, elevation is carried by a two-stop shadow plus a faint
 top hairline, and a single gradient does all the emphasis work.
 
-Theme tokens plus 34 UI primitives, packaged as a **copy-in source template** you can drop
+Theme tokens plus 49 UI primitives, packaged as a **copy-in source template** you can drop
 into any React app. MIT licensed — copy it, edit it, ship it.
 
 There is no build step and nothing to `npm install` from a registry. You copy `src/` into
@@ -41,7 +41,7 @@ npm run demo    # http://localhost:5173
 ```
 src/
   styles/tokens.css       the whole theme: light/dark vars, @theme mapping, .dp-* utilities
-  components/ui/*.tsx     34 primitives (shadcn "base-nova" style, built on @base-ui/react)
+  components/ui/*.tsx     49 primitives (shadcn "base-nova" style, built on @base-ui/react)
   lib/utils.ts            cn()
   lib/markdown.ts         the Markdown parser that components/ui/markdown.tsx renders
   lib/toast.tsx           ToastProvider + useToast()
@@ -243,34 +243,31 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 ## Components
 
 `accordion` · `alert` · `alert-dialog` · `avatar` · `badge` · `breadcrumb` · `button` ·
-`card` · `checkbox` · `citations` · `collapsible` · `composer` · `conversation` · `dialog` ·
-`dropdown-menu` · `error-box` · `field` · `input` · `label` · `markdown` · `popover` ·
-`progress` · `radio-group` · `scroll-area` · `select` · `separator` · `sheet` · `sidebar` ·
-`skeleton` · `switch` · `table` · `tabs` · `textarea` · `tooltip`
+`card` · `checkbox` · `checkbox-group` · `citations` · `collapsible` · `combobox` ·
+`composer` · `context-menu` · `conversation` · `dialog` · `dropdown-menu` · `error-box`
+· `field` · `input` · `label` · `markdown` · `menubar` · `meter` · `navigation-menu` ·
+`number-field` · `otp-field` · `pagination` · `password-input` · `popover` ·
+`preview-card` · `progress` · `radio-group` · `scroll-area` · `select` · `separator` ·
+`sheet` · `sidebar` · `skeleton` · `slider` · `switch` · `table` · `tabs` · `textarea` ·
+`toggle` · `toggle-group` · `toolbar` · `tooltip`
 
-### Forms
+### Authentication
 
-`field.tsx` is the one to reach for first. Without it every screen rebuilds the same
-four-part arrangement — label, control, hint, error — and gets the wiring subtly wrong:
-the hint not reachable by `aria-describedby`, the error announced only in colour, the
-label a `<div>` that does not focus the input when clicked.
+There is no login *page* — that is a template, not a primitive, and it is three of these
+composed. What the set does provide is the two controls people get wrong:
 
-```tsx
-<Form onSubmit={…}>
-  <Field name="dataset" validate={(v) => (v ? null : "A name is required.")}>
-    <FieldLabel>Dataset name</FieldLabel>
-    <FieldControl render={<Input placeholder="events_raw" />} />
-    <FieldDescription>Cannot be changed after creation.</FieldDescription>
-    <FieldError />
-  </Field>
-  <Button type="submit">Create</Button>
-</Form>
-```
+- **`password-input`** — a password box with a reveal toggle. The toggle is a
+  `type="button"` so it does not submit the form, its label changes with the state and
+  `aria-pressed` reports it, and `aria-controls` ties it to the input. Paste is never
+  blocked: blocking it breaks password managers and pushes people towards passwords they
+  can remember. Pass `autoComplete="new-password"` on sign-up and reset forms, or the
+  manager offers the old one.
+- **`otp-field`** — the 2FA code. One value underneath several boxes, so a pasted code
+  fills all of them, Backspace walks backwards, and SMS autofill reaches it. A row of
+  `<input maxlength="1">` gets none of that.
 
-`FieldControl` takes any of the controls through `render`, so `Input`, `Textarea`,
-`Checkbox`, `Switch`, `Select` and `RadioGroup` all get the same treatment. `Fieldset` +
-`FieldsetLegend` group related fields and point the legend at the group, so it is
-announced when focus enters rather than being a heading only sighted users get.
+Everything else a sign-in screen needs is already here: `Field` for the label/error
+wiring, `Input`, `Button`, `Checkbox` for "remember me", `Card` for the shell.
 
 ### Assistant panels
 

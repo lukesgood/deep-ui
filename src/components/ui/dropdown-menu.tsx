@@ -53,6 +53,15 @@ function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
 
+/** Labels a group, and Base UI means that literally: this is `Menu.GroupLabel`, and
+ *  rendering it outside a `<DropdownMenuGroup>` throws — which unmounts the whole
+ *  React tree, not just the menu. Always:
+ *
+ *      <DropdownMenuGroup>
+ *        <DropdownMenuLabel>events_raw</DropdownMenuLabel>
+ *        <DropdownMenuItem>…</DropdownMenuItem>
+ *      </DropdownMenuGroup>
+ */
 function DropdownMenuLabel({
   className,
   inset,
