@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import {
-  Blocks, ClipboardList, Database, Layers, MessageSquare, Moon, Palette, Radio, Sun,
-  Table2, Type,
+  ArrowLeft, Blocks, ClipboardList, Database, Layers, LayoutTemplate, MessageSquare,
+  Moon, Palette, Radio, Sun, Table2, Type,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -20,6 +20,7 @@ import { ToastProvider } from "@/lib/toast"
 import { ConfirmProvider } from "@/lib/confirm"
 
 import { SECTIONS } from "./Gallery"
+import { TEMPLATES, useTemplateRoute } from "./Templates"
 
 const ICONS = {
   Palette, Type, Layers, Blocks, Table2, Radio, Database, ClipboardList, MessageSquare,
@@ -40,6 +41,7 @@ function useTheme() {
 export default function App() {
   const [dark, toggleTheme] = useTheme()
   const [active, setActive] = useState<string>(SECTIONS[0].id)
+  const template = useTemplateRoute()
 
   // Highlight the nav entry for whatever section is nearest the top of the viewport.
   useEffect(() => {
@@ -58,6 +60,39 @@ export default function App() {
     })
     return () => observer.disconnect()
   }, [])
+
+  // A template is a whole screen, so it gets the whole viewport rather than being
+  // squeezed into a card in the gallery.
+  if (template) {
+    return (
+      <ToastProvider>
+        <ConfirmProvider>
+          <TooltipProvider>
+            <div className="flex min-h-svh flex-col">
+              <div className="flex h-10 shrink-0 items-center gap-3 border-b bg-background px-3">
+                <Button variant="ghost" size="sm" render={<a href="#templates" />}>
+                  <ArrowLeft /> Gallery
+                </Button>
+                <span className="text-sm text-muted-foreground">{template.title}</span>
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={toggleTheme}
+                  className="ml-auto"
+                  aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
+                >
+                  {dark ? <Sun /> : <Moon />}
+                </Button>
+              </div>
+              <div className="min-h-0 flex-1">
+                <template.render />
+              </div>
+            </div>
+          </TooltipProvider>
+        </ConfirmProvider>
+      </ToastProvider>
+    )
+  }
 
   return (
     <ToastProvider>
@@ -100,6 +135,24 @@ export default function App() {
                           </SidebarMenuItem>
                         )
                       })}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
+                <SidebarGroup>
+                  <SidebarGroupLabel>Templates</SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {TEMPLATES.map((t) => (
+                        <SidebarMenuItem key={t.id}>
+                          <SidebarMenuButton
+                            tooltip={t.title}
+                            render={<a href={`#/t/${t.id}`} />}
+                          >
+                            <LayoutTemplate />
+                            <span>{t.title}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
                     </SidebarMenu>
                   </SidebarGroupContent>
                 </SidebarGroup>

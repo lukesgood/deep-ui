@@ -54,6 +54,7 @@ src/
   lib/confirm.tsx         ConfirmProvider + useConfirm()  (promise-based window.confirm)
   hooks/use-mobile.ts     useIsMobile()
   hooks/use-stick-to-bottom.ts   follows a streaming log, but only while invited
+templates/                whole screens, also copy-in — see Templates below
 examples/demo/            the gallery above — not part of what you copy
 ```
 
@@ -324,6 +325,38 @@ Two more are worth calling out:
 
 `error-box.tsx` provides `<ErrorBox>` and `<EmptyState>`, the two surfaces that otherwise
 get reinvented ad hoc on every page.
+
+---
+
+## Templates
+
+`src/` gives you parts; `templates/` gives you three whole screens to start from. They
+are copy-in the same way, and they import the primitives through the same `@/*` alias, so
+what you see in the gallery is what you get from the file.
+
+| | |
+|---|---|
+| [`sign-in`](templates/sign-in.tsx) | Email, password and a second factor, as two steps rather than two screens |
+| [`settings`](templates/settings.tsx) | Tabs, grouped fields, and a save bar that appears only once something changed |
+| [`assistant-shell`](templates/assistant-shell.tsx) | An app shell with the assistant docked on the right |
+
+Each is a starting point, not a component — copy it and change everything. What is worth
+keeping is the wiring, which is invisible when right and expensive when wrong. Two things
+they demonstrate that are easy to get backwards:
+
+**Let the browser validate, and supply only the wording.** `type="email" required` already
+knows what a malformed address is. A custom `validate` alongside it looks like it works
+and does not — native validation fails first, so the custom one never runs and the reader
+gets the browser's *"Constraints not satisfied"*. One `<FieldError match="...">` per case
+is the fix.
+
+**A responsive panel has to branch in JavaScript, not CSS.** `assistant-shell` picks
+between a docked `<aside>` and a `<Sheet>` with `useIsMobile()`. Hiding the Sheet with
+`lg:hidden` instead leaves it *open* on desktop, so its backdrop dims and blurs the whole
+page behind a panel nobody can see.
+
+If you copy `templates/`, make sure your Tailwind setup scans it — a class used only in
+there is otherwise tree-shaken and the screen renders unstyled.
 
 ---
 

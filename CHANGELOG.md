@@ -14,6 +14,9 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **`templates/`** — three whole screens, copy-in like `src/`: `sign-in`,
+  `settings`, `assistant-shell`. The gallery serves them at `#/t/<id>`.
+  **In your copy:** additive, and optional — nothing in `src/` depends on them.
 - **Component tests** (`npm test`, now Vitest + happy-dom): every overlay opens, `Field`
   associates label/hint/error, the composer respects IME composition, the reveal toggle
   cannot submit its form, pagination announces the current page. 48 tests total.
@@ -110,6 +113,10 @@ Nothing has been tagged or released yet; everything below is on `main`.
   narrative that meant nothing outside the original codebase.
 
 ### Fixed
+
+- The demo's Tailwind scan covered `src/` but not `templates/`, so a class used only
+  in a template was tree-shaken: the sign-in card rendered with no padding at all.
+  Both trees are scanned now, and `check-tokens` lints both too.
 
 - **`DropdownMenuLabel` crashed the whole app when used without a `DropdownMenuGroup`.**
   It is Base UI's `Menu.GroupLabel`, which throws outside a group — and a throw during

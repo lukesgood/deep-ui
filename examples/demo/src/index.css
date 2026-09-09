@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
-/* The primitives live outside this app's root, so Tailwind has to be told to scan
-   them — otherwise every class used only inside src/components/ui is tree-shaken. */
+/* Both copy-in trees live outside this app's root, so Tailwind has to be told to
+   scan them — otherwise a class used only in there is tree-shaken and the component
+   silently renders unstyled. That is not hypothetical: `p-5` appeared only in
+   templates/, so it was never generated, and the sign-in card had no padding. */
 @source "../../../src";
+@source "../../../templates";
 
 @import "../../../src/styles/tokens.css";

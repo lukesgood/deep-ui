@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Guards the rules that this system keeps breaking when nobody is looking.
+ * Guards the rules that this system keeps breaking when nobody is looking, across
+ * everything that gets copied into someone's project — `src/` and `templates/`.
  *
  * Three of the bugs in this repo's history were a component reaching past the
  * tokens for a literal colour, and each one was invisible in whichever theme the
@@ -44,9 +45,9 @@ const RULES = [
     why: "stacking order belongs on the --dp-z-* ladder, or overlays fight by DOM order",
     pattern: /\bz-\d+\b/g,
     allowed: {
-      "components/ui/tooltip.tsx":
+      "src/components/ui/tooltip.tsx":
         "lifts a <kbd> above its siblings inside the tooltip's own stacking context — local, not a rung on the ladder",
-      "components/ui/select.tsx":
+      "src/components/ui/select.tsx":
         "the scroll-up/down buttons inside the select popup — local to that popup",
     },
   },
@@ -71,12 +72,15 @@ function walk(dir) {
   return out
 }
 
-const files = walk(join(ROOT, "src"))
+// Both trees are copy-in, so both answer to the same rules. Paths are reported
+// relative to the repo root so an allowlist entry says which tree it is in.
+const ROOTS = ["src", "templates"]
+const files = ROOTS.flatMap((dir) => walk(join(ROOT, dir)))
 const violations = []
 let scanned = 0
 
 for (const file of files) {
-  const rel = relative(join(ROOT, "src"), file)
+  const rel = relative(ROOT, file)
   const lines = readFileSync(file, "utf8").split("\n")
   scanned++
 
