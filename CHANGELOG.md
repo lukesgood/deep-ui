@@ -14,6 +14,14 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **Seven primitives**, taking the set from 24 to 31. All wrap Base UI rather than
+  hand-rolling behaviour:
+  - **`field`** — `Field`, `FieldLabel`, `FieldControl`, `FieldDescription`, `FieldError`,
+    `Fieldset`, `FieldsetLegend`, `Form`. The biggest hole in the set: there was no way to
+    associate a label, a hint and an error with a control, so every screen did it by hand.
+  - **`popover`**, **`radio-group`**, **`avatar`**, **`progress`**, **`scroll-area`**,
+    **`accordion`**.
+  **In your copy:** additive — nothing existing changed. Copy the files you want.
 - **A stacking ladder**: `--dp-z-raised` (10), `-sticky` (30), `-backdrop` (40), `-modal`
   (50), `-popover` (60), `-tooltip` (70), `-toast` (80).
   **In your copy:** if you wrote your own overlay at `z-50`, it now ties with dialogs.

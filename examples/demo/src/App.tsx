@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import {
-  Blocks, Database, Layers, Moon, Palette, Radio, Sun, Table2, Type,
+  Blocks, ClipboardList, Database, Layers, Moon, Palette, Radio, Sun, Table2, Type,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -20,7 +20,7 @@ import { ConfirmProvider } from "@/lib/confirm"
 
 import { SECTIONS } from "./Gallery"
 
-const ICONS = { Palette, Type, Layers, Blocks, Table2, Radio, Database } as const
+const ICONS = { Palette, Type, Layers, Blocks, Table2, Radio, Database, ClipboardList } as const
 
 /** The template ships no theme switcher on purpose — dark mode is just a `.dark`
  *  class on an ancestor. This is the four lines an app needs to drive it. */

@@ -4,7 +4,7 @@
 rather than left at a default grey, elevation is carried by a two-stop shadow plus a faint
 top hairline, and a single gradient does all the emphasis work.
 
-Theme tokens plus 24 UI primitives, packaged as a **copy-in source template** you can drop
+Theme tokens plus 31 UI primitives, packaged as a **copy-in source template** you can drop
 into any React app. MIT licensed — copy it, edit it, ship it.
 
 There is no build step and nothing to `npm install` from a registry. You copy `src/` into
@@ -41,7 +41,7 @@ npm run demo    # http://localhost:5173
 ```
 src/
   styles/tokens.css       the whole theme: light/dark vars, @theme mapping, .dp-* utilities
-  components/ui/*.tsx     24 primitives (shadcn "base-nova" style, built on @base-ui/react)
+  components/ui/*.tsx     31 primitives (shadcn "base-nova" style, built on @base-ui/react)
   lib/utils.ts            cn()
   lib/markdown.ts         the Markdown parser that components/ui/markdown.tsx renders
   lib/toast.tsx           ToastProvider + useToast()
@@ -241,12 +241,37 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 ## Components
 
-`alert` · `alert-dialog` · `badge` · `breadcrumb` · `button` · `card` · `checkbox` ·
-`collapsible` · `dialog` · `dropdown-menu` · `error-box` · `input` · `label` · `markdown` ·
+`accordion` · `alert` · `alert-dialog` · `avatar` · `badge` · `breadcrumb` · `button` ·
+`card` · `checkbox` · `collapsible` · `dialog` · `dropdown-menu` · `error-box` · `field` ·
+`input` · `label` · `markdown` · `popover` · `progress` · `radio-group` · `scroll-area` ·
 `select` · `separator` · `sheet` · `sidebar` · `skeleton` · `switch` · `table` · `tabs` ·
 `textarea` · `tooltip`
 
-Two are worth calling out:
+### Forms
+
+`field.tsx` is the one to reach for first. Without it every screen rebuilds the same
+four-part arrangement — label, control, hint, error — and gets the wiring subtly wrong:
+the hint not reachable by `aria-describedby`, the error announced only in colour, the
+label a `<div>` that does not focus the input when clicked.
+
+```tsx
+<Form onSubmit={…}>
+  <Field name="dataset" validate={(v) => (v ? null : "A name is required.")}>
+    <FieldLabel>Dataset name</FieldLabel>
+    <FieldControl render={<Input placeholder="events_raw" />} />
+    <FieldDescription>Cannot be changed after creation.</FieldDescription>
+    <FieldError />
+  </Field>
+  <Button type="submit">Create</Button>
+</Form>
+```
+
+`FieldControl` takes any of the controls through `render`, so `Input`, `Textarea`,
+`Checkbox`, `Switch`, `Select` and `RadioGroup` all get the same treatment. `Fieldset` +
+`FieldsetLegend` group related fields and point the legend at the group, so it is
+announced when focus enters rather than being a heading only sighted users get.
+
+Two more are worth calling out:
 
 - **`sidebar.tsx`** (723 lines) is the largest piece — a full collapsible app shell with
   rail, mobile sheet fallback, keyboard shortcut, and cookie-persisted state. It depends on

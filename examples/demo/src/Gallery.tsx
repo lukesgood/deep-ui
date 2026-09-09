@@ -4,11 +4,15 @@ import {
   Trash2, TriangleAlert,
 } from "lucide-react"
 
+import {
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Alert, AlertAction, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -27,9 +31,21 @@ import {
   DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { EmptyState, ErrorBox } from "@/components/ui/error-box"
+import {
+  Field, FieldControl, FieldDescription, FieldError, FieldLabel, Fieldset,
+  FieldsetLegend, Form,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Markdown } from "@/components/ui/markdown"
+import {
+  Popover, PopoverContent, PopoverDescription, PopoverTitle, PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Progress, ProgressLabel, ProgressTrack, ProgressValue,
+} from "@/components/ui/progress"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
@@ -374,6 +390,34 @@ function ControlsSection() {
           </div>
         </Panel>
 
+        <Panel title="Avatar and Progress" note="The avatar falls back on its own when the image fails; progress reports its number to assistive tech, and `value={null}` says indeterminate instead of inventing a percentage.">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Avatar>
+                <AvatarImage src="https://example.invalid/nope.png" alt="" />
+                <AvatarFallback>LH</AvatarFallback>
+              </Avatar>
+              <Avatar className="size-10">
+                <AvatarFallback>DP</AvatarFallback>
+              </Avatar>
+              <span className="text-xs text-muted-foreground">
+                the first has a broken image URL
+              </span>
+            </div>
+            <Progress value={62}>
+              <div className="flex items-baseline justify-between">
+                <ProgressLabel className="text-xs">Backfill</ProgressLabel>
+                <ProgressValue />
+              </div>
+              <ProgressTrack />
+            </Progress>
+            <Progress value={null}>
+              <ProgressLabel className="text-xs">Compacting</ProgressLabel>
+              <ProgressTrack />
+            </Progress>
+          </div>
+        </Panel>
+
         <Panel title="Textarea" note="Invalid state borrows --destructive through aria-invalid.">
           <div className="space-y-3">
             <Textarea placeholder="Describe what this pipeline does…" rows={3} />
@@ -382,6 +426,84 @@ function ControlsSection() {
         </Panel>
       </Grid>
     </div>
+  )
+}
+
+/* ─────────────────────────────── 4. forms ────────────────────────────────── */
+
+const TIERS = [
+  { value: "free", label: "Free", hint: "1 pond, 7-day retention" },
+  { value: "team", label: "Team", hint: "unlimited ponds, 90 days" },
+  { value: "enterprise", label: "Enterprise", hint: "self-hosted, audit log" },
+] as const
+
+function FormsSection() {
+  const { toast } = useToast()
+  const [tier, setTier] = React.useState<unknown>("team")
+
+  return (
+    <Grid>
+      <Panel
+        title="Field"
+        note="The four-part arrangement every screen was otherwise rebuilding by hand. Submit it empty — the error is announced, not just coloured."
+      >
+        <Form
+          onSubmit={(event) => {
+            event.preventDefault()
+            toast("Dataset created", "success")
+          }}
+        >
+          <Field
+            name="dataset"
+            validate={(value) => {
+              const v = String(value ?? "")
+              if (!v) return "A name is required."
+              if (!/^[a-z][a-z0-9_]*$/.test(v))
+                return "Lowercase letters, digits and underscores only."
+              return null
+            }}
+            validationMode="onBlur"
+          >
+            <FieldLabel>Dataset name</FieldLabel>
+            <FieldControl render={<Input placeholder="events_raw" />} />
+            <FieldDescription>Cannot be changed after creation.</FieldDescription>
+            <FieldError />
+          </Field>
+
+          <Field name="notes">
+            <FieldLabel>Notes</FieldLabel>
+            <FieldControl render={<Textarea rows={2} placeholder="Optional." />} />
+          </Field>
+
+          <div>
+            <Button type="submit" size="sm">Create dataset</Button>
+          </div>
+        </Form>
+      </Panel>
+
+      <Panel
+        title="Fieldset and RadioGroup"
+        note="The legend is pointed at the group, so it is announced when focus enters rather than being a heading only sighted users get."
+      >
+        <Fieldset>
+          <FieldsetLegend>Plan</FieldsetLegend>
+          <RadioGroup value={tier} onValueChange={setTier}>
+            {TIERS.map((t) => (
+              <label
+                key={t.value}
+                className="flex cursor-pointer items-start gap-2.5 rounded-lg border p-2.5 transition-colors hover:bg-muted/50 has-data-checked:border-primary has-data-checked:bg-primary/5"
+              >
+                <RadioGroupItem value={t.value} className="mt-0.5" />
+                <span className="min-w-0">
+                  <span className="block text-sm font-medium">{t.label}</span>
+                  <span className="block text-xs text-muted-foreground">{t.hint}</span>
+                </span>
+              </label>
+            ))}
+          </RadioGroup>
+        </Fieldset>
+      </Panel>
+    </Grid>
   )
 }
 
@@ -471,6 +593,32 @@ function DataSection() {
                 <TabsTrigger value="b">Variant</TabsTrigger>
               </TabsList>
             </Tabs>
+          </div>
+        </Panel>
+
+        <Panel title="Accordion and ScrollArea" note="The scrollbar stays visible: on macOS the platform one hides until you scroll, so a pane that can scroll looks exactly like one that cannot.">
+          <div className="space-y-4">
+            <Accordion>
+              <AccordionItem value="a">
+                <AccordionTrigger>Why is this table degraded?</AccordionTrigger>
+                <AccordionContent>
+                  The upstream sync missed its window twice in a row.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="b">
+                <AccordionTrigger>What runs at 02:00?</AccordionTrigger>
+                <AccordionContent>Compaction, then the retention sweep.</AccordionContent>
+              </AccordionItem>
+            </Accordion>
+            <ScrollArea className="h-28 rounded-lg border p-2">
+              <ul className="space-y-1 text-xs text-muted-foreground">
+                {Array.from({ length: 14 }, (_, i) => (
+                  <li key={i} className="dp-num font-mono">
+                    run_{String(2048 - i).padStart(4, "0")} · ok · 1.{i}s
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
           </div>
         </Panel>
 
@@ -601,6 +749,20 @@ function OverlaysSection() {
             info
           </Button>
         </div>
+      </Panel>
+
+      <Panel title="Popover" note="Titled and described, so it announces as a region with content rather than an unlabelled floating box.">
+        <Popover>
+          <PopoverTrigger render={<Button variant="outline" size="sm" />}>
+            Retention policy
+          </PopoverTrigger>
+          <PopoverContent>
+            <PopoverTitle>Retention</PopoverTitle>
+            <PopoverDescription className="mt-1">
+              Rows older than 90 days are moved to cold storage on the nightly run.
+            </PopoverDescription>
+          </PopoverContent>
+        </Popover>
       </Panel>
 
       <Panel title="Dropdown menu">
@@ -737,6 +899,13 @@ export const SECTIONS = [
     icon: "Blocks",
     note: "Everything a person clicks or types into.",
     render: ControlsSection,
+  },
+  {
+    id: "forms",
+    title: "Forms",
+    icon: "ClipboardList",
+    note: "Label, control, hint and error, wired together instead of assembled by hand.",
+    render: FormsSection,
   },
   {
     id: "data",
