@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
   ArrowUpRight, CircleAlert, Copy, Database, Inbox, MoreHorizontal, Pencil,
-  Trash2, TriangleAlert,
+  RefreshCw, Trash2, TriangleAlert,
 } from "lucide-react"
 
 import {
@@ -19,6 +19,13 @@ import {
   Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle,
 } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Citation, Citations } from "@/components/ui/citations"
+import {
+  Composer, ComposerInput, ComposerSubmit,
+} from "@/components/ui/composer"
+import {
+  Conversation, ConversationActions, ConversationMessage, ConversationPending,
+} from "@/components/ui/conversation"
 import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible"
@@ -876,6 +883,150 @@ function FeedbackSection() {
   )
 }
 
+/* ──────────────────────────── 7. assistant ──────────────────────────────── */
+
+const ANSWER = `**billing_export** failed on its third retry last night. Two causes are
+consistent with the logs:
+
+1. the upstream \`sessions_hourly\` table has been *degraded* since 02:14 [1]
+2. the warehouse credential expired on Tuesday [2]
+
+The retention sweep ran anyway, so no rows were lost.
+
+\`\`\`sql
+select * from run_log where job = 'billing_export' order by started_at desc limit 3;
+\`\`\``
+
+const SOURCES = [
+  { index: 1, title: "sessions_hourly — run history", location: "warehouse/run_log.parquet" },
+  { index: 2, title: "Credential rotation policy", location: "docs/ops/credentials.md" },
+]
+
+type Turn = { id: number; from: "user" | "assistant"; text: string }
+
+const OPENING: Turn[] = [
+  { id: 0, from: "user", text: "Why did billing_export fail?" },
+]
+
+function AssistantSection() {
+  const { toast } = useToast()
+  const [turns, setTurns] = React.useState<Turn[]>(OPENING)
+  const [draft, setDraft] = React.useState("")
+  const [busy, setBusy] = React.useState(false)
+  const [streamed, setStreamed] = React.useState("")
+  const timer = React.useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const stop = React.useCallback(() => {
+    if (timer.current) clearInterval(timer.current)
+    timer.current = null
+    setBusy(false)
+    setStreamed((text) => {
+      if (text) setTurns((t) => [...t, { id: Date.now(), from: "assistant", text }])
+      return ""
+    })
+  }, [])
+
+  React.useEffect(() => () => { if (timer.current) clearInterval(timer.current) }, [])
+
+  const send = () => {
+    const text = draft.trim() || "Why did billing_export fail?"
+    setDraft("")
+    setTurns((t) => [...t, { id: Date.now(), from: "user", text }])
+    setBusy(true)
+    setStreamed("")
+    let i = 0
+    timer.current = setInterval(() => {
+      i += 6
+      if (i >= ANSWER.length) {
+        if (timer.current) clearInterval(timer.current)
+        timer.current = null
+        setStreamed("")
+        setTurns((t) => [...t, { id: Date.now() + 1, from: "assistant", text: ANSWER }])
+        setBusy(false)
+        return
+      }
+      setStreamed(ANSWER.slice(0, i))
+    }, 16)
+  }
+
+  return (
+    <div className="space-y-4">
+      <Panel
+        title="A panel, assembled from the parts"
+        note="The shell is Sidebar side=&quot;right&quot; or Sheet — this is what goes inside it. Send a message: the log follows the stream, and stops following the moment you scroll up."
+        className="overflow-hidden"
+      >
+        <div className="flex h-96 flex-col gap-2">
+          <Conversation label="Assistant conversation" className="rounded-lg border">
+            {turns.map((t) => (
+              <ConversationMessage key={t.id} from={t.from}>
+                {t.from === "assistant" ? (
+                  <Markdown
+                    text={t.text}
+                    citations
+                    citationHref={(n) => `#citation-${n}`}
+                  />
+                ) : (
+                  t.text
+                )}
+                {t.from === "assistant" && (
+                  <ConversationActions className="mt-1.5 -mb-0.5">
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      aria-label="Copy answer"
+                      onClick={() => toast("Answer copied", "success")}
+                    >
+                      <Copy />
+                    </Button>
+                    <Button
+                      size="icon-xs"
+                      variant="ghost"
+                      aria-label="Regenerate answer"
+                      onClick={send}
+                    >
+                      <RefreshCw />
+                    </Button>
+                  </ConversationActions>
+                )}
+              </ConversationMessage>
+            ))}
+            {busy &&
+              (streamed ? (
+                <ConversationMessage from="assistant">
+                  <Markdown text={streamed} citations citationHref={(n) => `#citation-${n}`} />
+                </ConversationMessage>
+              ) : (
+                <ConversationPending />
+              ))}
+          </Conversation>
+
+          <Composer busy={busy} onSend={send}>
+            <ComposerInput
+              value={draft}
+              onChange={(e) => setDraft(e.target.value)}
+              placeholder="Ask about a dataset…  (Enter sends, Shift+Enter for a new line)"
+              aria-label="Message"
+            />
+            <ComposerSubmit onStop={stop} />
+          </Composer>
+        </div>
+      </Panel>
+
+      <Panel
+        title="Citations"
+        note="The other half of the [n] markers. Click one in the answer above — it is a same-page anchor, so it works with JavaScript off and :target does the highlight. Sources are shown, never linked out."
+      >
+        <Citations>
+          {SOURCES.map((c) => (
+            <Citation key={c.index} {...c} />
+          ))}
+        </Citations>
+      </Panel>
+    </div>
+  )
+}
+
 /* ───────────────────────────────── index ────────────────────────────────── */
 
 export const SECTIONS = [
@@ -920,6 +1071,13 @@ export const SECTIONS = [
     icon: "Radio",
     note: "Anything that floats above the page, plus the two provider-backed helpers.",
     render: OverlaysSection,
+  },
+  {
+    id: "assistant",
+    title: "Assistant",
+    icon: "MessageSquare",
+    note: "The conversation container, the prompt box, and the sources a [n] marker points at.",
+    render: AssistantSection,
   },
   {
     id: "feedback",

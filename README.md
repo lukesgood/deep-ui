@@ -4,7 +4,7 @@
 rather than left at a default grey, elevation is carried by a two-stop shadow plus a faint
 top hairline, and a single gradient does all the emphasis work.
 
-Theme tokens plus 31 UI primitives, packaged as a **copy-in source template** you can drop
+Theme tokens plus 34 UI primitives, packaged as a **copy-in source template** you can drop
 into any React app. MIT licensed — copy it, edit it, ship it.
 
 There is no build step and nothing to `npm install` from a registry. You copy `src/` into
@@ -41,12 +41,13 @@ npm run demo    # http://localhost:5173
 ```
 src/
   styles/tokens.css       the whole theme: light/dark vars, @theme mapping, .dp-* utilities
-  components/ui/*.tsx     31 primitives (shadcn "base-nova" style, built on @base-ui/react)
+  components/ui/*.tsx     34 primitives (shadcn "base-nova" style, built on @base-ui/react)
   lib/utils.ts            cn()
   lib/markdown.ts         the Markdown parser that components/ui/markdown.tsx renders
   lib/toast.tsx           ToastProvider + useToast()
   lib/confirm.tsx         ConfirmProvider + useConfirm()  (promise-based window.confirm)
   hooks/use-mobile.ts     useIsMobile()
+  hooks/use-stick-to-bottom.ts   follows a streaming log, but only while invited
 examples/demo/            the gallery above — not part of what you copy
 ```
 
@@ -242,10 +243,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 ## Components
 
 `accordion` · `alert` · `alert-dialog` · `avatar` · `badge` · `breadcrumb` · `button` ·
-`card` · `checkbox` · `collapsible` · `dialog` · `dropdown-menu` · `error-box` · `field` ·
-`input` · `label` · `markdown` · `popover` · `progress` · `radio-group` · `scroll-area` ·
-`select` · `separator` · `sheet` · `sidebar` · `skeleton` · `switch` · `table` · `tabs` ·
-`textarea` · `tooltip`
+`card` · `checkbox` · `citations` · `collapsible` · `composer` · `conversation` · `dialog` ·
+`dropdown-menu` · `error-box` · `field` · `input` · `label` · `markdown` · `popover` ·
+`progress` · `radio-group` · `scroll-area` · `select` · `separator` · `sheet` · `sidebar` ·
+`skeleton` · `switch` · `table` · `tabs` · `textarea` · `tooltip`
 
 ### Forms
 
@@ -270,6 +271,44 @@ label a `<div>` that does not focus the input when clicked.
 `Checkbox`, `Switch`, `Select` and `RadioGroup` all get the same treatment. `Fieldset` +
 `FieldsetLegend` group related fields and point the legend at the group, so it is
 announced when focus enters rather than being a heading only sighted users get.
+
+### Assistant panels
+
+`markdown.tsx` was always half of an assistant panel — it renders the subset a model
+emits, and `citations` turns `[1]` into a marker. `conversation`, `composer` and
+`citations` are the other half. There is no panel *shell*: dock it with
+`<Sidebar side="right">` or float it with `<Sheet>`, both of which already exist.
+
+```tsx
+<Conversation label="Assistant conversation">
+  {turns.map((t) => (
+    <ConversationMessage key={t.id} from={t.from}>
+      {t.from === "assistant"
+        ? <Markdown text={t.text} citations citationHref={(n) => `#citation-${n}`} />
+        : t.text}
+    </ConversationMessage>
+  ))}
+  {busy && <ConversationPending />}
+</Conversation>
+
+<Composer busy={busy} onSend={send}>
+  <ComposerInput value={draft} onChange={…} aria-label="Message" />
+  <ComposerSubmit onStop={stop} />
+</Composer>
+```
+
+Three decisions in there worth knowing:
+
+- **The log follows the stream only while you left it at the bottom.** Scroll up to
+  re-read something and it stops following; a jump-to-latest button appears instead.
+  Yanking someone back down on every token is worse than not following at all.
+- **Enter sends, Shift+Enter breaks the line — except mid-composition.** In Korean,
+  Japanese and Chinese input the first Enter commits the IME candidate, so binding it
+  unconditionally truncates the sentence mid-word.
+- **Citations are shown, never linked out.** `citationHref` builds a *same-page* anchor
+  to the matching `<Citation>`, so it works with JavaScript off and `:target` does the
+  highlight. The prose and any URLs in it come from ingested documents, which is the same
+  reason `lib/markdown.ts` refuses to build anchors at all.
 
 Two more are worth calling out:
 

@@ -14,6 +14,17 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **An assistant panel's missing half.** `markdown.tsx` rendered model output and
+  marked citations, but nothing held a conversation, took a prompt, or showed the
+  sources a `[n]` pointed at. Now `conversation` (`Conversation`,
+  `ConversationMessage`, `ConversationActions`, `ConversationPending`), `composer`
+  (`Composer`, `ComposerInput`, `ComposerSubmit`) and `citations` (`Citations`,
+  `Citation`), plus `hooks/use-stick-to-bottom.ts`. There is no panel shell — dock it
+  with `Sidebar side="right"` or float it with `Sheet`.
+  **In your copy:** additive.
+- `Markdown` takes an optional `citationHref`. Omit it and `[n]` renders exactly as
+  before; give it one and the marker becomes a same-page anchor.
+  **In your copy:** no change unless you want the links.
 - **Seven primitives**, taking the set from 24 to 31. All wrap Base UI rather than
   hand-rolling behaviour:
   - **`field`** — `Field`, `FieldLabel`, `FieldControl`, `FieldDescription`, `FieldError`,
