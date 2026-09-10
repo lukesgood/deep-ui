@@ -7,6 +7,10 @@ top hairline, and a single gradient does all the emphasis work.
 Theme tokens plus 49 UI primitives, packaged as a **copy-in source template** you can drop
 into any React app. MIT licensed — copy it, edit it, ship it.
 
+Currently **v0.1.0**. Since you copy the source rather than install it, a version is not
+something you can bump — it is a point you can name. Take a copy at a tag, and
+[CHANGELOG.md](./CHANGELOG.md) tells you what to change in your own files to catch up.
+
 There is no build step and nothing to `npm install` from a registry. You copy `src/` into
 your project, install the peer dependencies, and own the code from then on. That is the
 same model shadcn/ui uses, and it is deliberate: these components are meant to be edited.

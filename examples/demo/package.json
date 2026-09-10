@@ -1,6 +1,6 @@
 {
   "name": "deep-ui-demo",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Live gallery for the Deep design system — every token and every primitive on one page.",
   "type": "module",

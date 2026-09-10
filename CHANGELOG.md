@@ -8,9 +8,15 @@ the only upgrade path**. Nobody can `npm update` a copy they took last month —
 read this file and apply what matters to them. So entries here say what to change in
 your own copy, not just what moved in this repo.
 
-Nothing has been tagged or released yet; everything below is on `main`.
-
 ## [Unreleased]
+
+Nothing yet.
+
+## [0.1.0] — 2026-09-10
+
+The first release. `0.x` on purpose: the shape is settled enough to copy and use,
+and not settled enough to promise it will not move. Read the entries below as the
+upgrade path from a copy taken before this tag.
 
 ### Added
 
@@ -189,7 +195,10 @@ Nothing has been tagged or released yet; everything below is on `main`.
 - `scripts/check-contrast.mjs` read only the first `:root` block, so a stylesheet that
   opens `:root` twice would have been measured against the wrong half.
 
-## [1.0.0] — 2026-08-31
+### Where this came from
 
-Initial extraction from [DataPond](https://github.com/lukesgood/datapond): theme
-tokens plus 24 primitives, as a standalone copy-in template.
+Extracted from [DataPond](https://github.com/lukesgood/datapond) on 31 August 2026 as
+theme tokens plus 24 primitives. That snapshot was never tagged or released, so it is
+part of this release rather than a version of its own.
+
+[0.1.0]: https://github.com/lukesgood/deep-ui/releases/tag/v0.1.0
