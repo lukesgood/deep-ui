@@ -10,6 +10,22 @@ your own copy, not just what moved in this repo.
 
 ## [Unreleased]
 
+### Fixed
+
+- **Four files did not compile in the place they are meant to be copied to.** Vite's
+  `react-ts` template turns on `verbatimModuleSyntax` and `noUnusedLocals`; under those,
+  `error-box`, `confirm` and `toast` failed on `ReactNode` imported as a value rather
+  than a type, and `otp-field` on a stray `import * as React`. Found by actually
+  scaffolding an app and copying `src/` into it, which nobody had done. The repo's own
+  `tsconfig.json` now uses those options, so it cannot happen again.
+  **In your copy:** re-copy those four files.
+- `scripts/check-portable.mjs` (`npm run check:portable`) — every import under `src/`
+  must resolve inside the copied tree or to a package the README tells people to
+  install. A relative path climbing out of `src/`, or a devDependency that happens to
+  be present here, resolves in this repo and fails in theirs.
+- The README told you to set `baseUrl`, which is deprecated as of TypeScript 6 and now
+  errors. `paths` has not needed it for years.
+
 ### Changed
 
 - `leading-none` on labels and titles became `leading-tight`. A line-height of exactly

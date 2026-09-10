@@ -1,6 +1,5 @@
 "use client"
 
-import * as React from "react"
 import { OTPField as OtpFieldPrimitive } from "@base-ui/react/otp-field"
 
 import { cn } from "@/lib/utils"

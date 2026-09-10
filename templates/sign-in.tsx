@@ -117,7 +117,7 @@ export function SignIn({ onSignedIn }: { onSignedIn?: () => void }) {
               <Code onBack={() => setStep("identify")} onDone={() => onSignedIn?.()} />
             )}
             {step === "link-sent" && (
-              <LinkSent email={email} onBack={() => setStep("identify")} />
+              <LinkSent onBack={() => setStep("identify")} />
             )}
           </CardContent>
         </Card>
@@ -308,7 +308,7 @@ function Code({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
 /** The only method whose next step happens somewhere else, so this screen's whole
  *  job is to be unambiguous about that and to offer a way out of the dead end —
  *  a resend, and a way back if the address was wrong. */
-function LinkSent({ email, onBack }: { email: string; onBack: () => void }) {
+function LinkSent({ onBack }: { onBack: () => void }) {
   const [seconds, setSeconds] = React.useState(RESEND_SECONDS)
 
   React.useEffect(() => {

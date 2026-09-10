@@ -12,6 +12,12 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    /* The defaults in Vite's react-ts template. Checking under them here is the only
+       way to know that a file still compiles in the place it is meant to be copied
+       to — four of them did not, and nothing in this repo noticed. */
+    "verbatimModuleSyntax": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "paths": { "@/*": ["./src/*"] }

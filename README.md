@@ -98,10 +98,19 @@ root now contains `components/`, `lib/`, and `hooks/`.
 
 ### 3. Wire the alias
 
-`tsconfig.json`:
+`tsconfig.json` (or `tsconfig.app.json` in a Vite app):
 
 ```json
-{ "compilerOptions": { "baseUrl": ".", "paths": { "@/*": ["./*"] } } }
+{ "compilerOptions": { "paths": { "@/*": ["./src/*"] } } }
+```
+
+No `baseUrl`. It is deprecated as of TypeScript 6 and errors outright, and `paths` has
+not needed it for years — it resolves relative to the `tsconfig.json` it is written in.
+
+Your bundler needs the same alias. For Vite:
+
+```ts
+resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } }
 ```
 
 ### 4. Import the tokens
@@ -583,6 +592,18 @@ is MIT and stands alone. What changed:
 
 ---
 
+## If it does not compile in your app
+
+The template is checked under the same compiler options Vite's `react-ts` template turns
+on — `verbatimModuleSyntax`, `noUnusedLocals`, `noUnusedParameters` — because that is
+where these files are meant to end up. Four of them did not compile there before anyone
+tried it, and nothing in this repo noticed: a `ReactNode` imported as a value rather
+than a type fails under `verbatimModuleSyntax`, and a stray `import * as React` fails
+under `noUnusedLocals`.
+
+If you hit something like that anyway, it is a bug here rather than a configuration
+problem on your side. Please file it.
+
 ## Verifying a change
 
 The template itself is never built or published; `package.json` and `tsconfig.json` are
@@ -598,6 +619,7 @@ npm run check        # everything below, which is exactly what CI runs
 npm run typecheck       # the template and the tests
 npm test                # 148 tests — every component mounts, plus the behaviour above
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
+npm run check:portable  # src/ imports nothing a copy would not have
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't

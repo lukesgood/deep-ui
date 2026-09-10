@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "vitest"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { cleanup, render, screen } from "@testing-library/react"
 
 import { Button } from "@/components/ui/button"
 import { Markdown } from "@/components/ui/markdown"

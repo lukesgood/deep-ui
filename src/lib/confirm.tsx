@@ -4,7 +4,8 @@
 // destructive actions get a consistent, accessible, on-brand prompt.
 // Usage:  const confirm = useConfirm()
 //         if (!(await confirm({ title, message, destructive: true }))) return
-import { createContext, useContext, useRef, useState, useCallback, ReactNode } from "react"
+import { createContext, useContext, useRef, useState, useCallback } from "react"
+import type { ReactNode } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { useStrings } from "@/lib/strings"

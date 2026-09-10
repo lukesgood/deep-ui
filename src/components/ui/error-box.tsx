@@ -1,5 +1,5 @@
 import { AlertCircle } from "lucide-react"
-import { ReactNode } from "react"
+import type { ReactNode } from "react"
 
 /** Consistent inline error surface (replaces ad-hoc amber/red error divs).
  *
