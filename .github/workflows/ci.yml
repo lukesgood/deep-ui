@@ -48,6 +48,9 @@ jobs:
       - name: Palette contrast
         run: npm run check:contrast
 
+      - name: Dead selectors
+        run: npm run check:selectors
+
       - name: Documented numbers
         run: npm run check:docs
 
