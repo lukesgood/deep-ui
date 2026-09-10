@@ -22,8 +22,9 @@
     "test:watch": "vitest",
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:docs": "node scripts/check-docs.mjs",
     "typecheck": "tsc --noEmit",
-    "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm test && npm run check:tokens && npm run check:contrast && npm run demo:build",
+    "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm test && npm run check:tokens && npm run check:contrast && npm run check:docs && npm run demo:build",
     "demo": "npm run dev -w deep-ui-demo",
     "demo:build": "npm run build -w deep-ui-demo"
   },

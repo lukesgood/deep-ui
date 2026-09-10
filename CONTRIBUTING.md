@@ -84,7 +84,7 @@ npm run check:contrast                # summary
 npm run check:contrast -- --verbose   # every pair, with its ratio
 ```
 
-It reads the real values out of `src/styles/tokens.css` and measures 224 pairs across
+It reads the real values out of `src/styles/tokens.css` and measures 232 pairs across
 both themes — every text token against all four surfaces and against its own 10%
 tint, every foreground on the fill it sits on, and the solid status step, chart ramp
 and focus ring at 3:1.

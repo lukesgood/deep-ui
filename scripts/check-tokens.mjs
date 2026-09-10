@@ -52,6 +52,12 @@ const RULES = [
     },
   },
   {
+    id: "raw-html",
+    why: "SECURITY.md promises no path from content to markup; this is that promise, enforced",
+    pattern: /dangerouslySetInnerHTML|\.innerHTML\s*=/g,
+    allowed: {},
+  },
+  {
     id: "arbitrary-font-size",
     why: "type sizes come from the scale; add a step to @theme rather than a one-off",
     pattern: /text-\[[0-9.]+(?:px|rem)\]/g,

@@ -45,5 +45,8 @@ jobs:
       - name: Palette contrast
         run: npm run check:contrast
 
+      - name: Documented numbers
+        run: npm run check:docs
+
       - name: Build the demo
         run: npm run demo:build

@@ -14,6 +14,20 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **A smoke test that mounts every component** (`test/smoke.test.tsx`), overlays in
+  their open state, with the case list checked against the directory so a new
+  component cannot arrive without one. This is the bug class that already bit: a
+  throw during render unmounts the whole tree, and wiring a component is not the
+  same act as mounting one.
+- **`test/security.test.tsx`** — the two properties `SECURITY.md` claims, asserted:
+  nothing in the input becomes markup, and a URL in rendered text never becomes a
+  link. `check:tokens` gained a rule that fails on `dangerouslySetInnerHTML`, so the
+  first is enforced as well as tested.
+- **`scripts/check-docs.mjs`** (`npm run check:docs`) — the README's countable claims,
+  checked against the code. Three had already drifted; it caught a fourth of mine
+  minutes after being written.
+- `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue and pull request templates, `.editorconfig`,
+  `.nvmrc`, and the demo page's description, favicon and per-theme `theme-color`.
 - **`templates/profile.tsx`** — the account screen the set had no version of: identity
   with a gradient initials avatar, a passkey list with per-device dates, active sessions
   with the current one named, and account deletion. Every destructive action goes through

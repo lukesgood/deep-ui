@@ -386,7 +386,7 @@ button or an inline error actually renders:
 - text tokens clear **4.5:1** (WCAG 2.1 AA, normal text)
 - the solid status step, the chart ramp and the focus ring clear **3:1** (AA non-text)
 
-That is 224 pairs, and they all pass. Several light-theme values are darker than a stock
+That is 232 pairs, and they all pass. Several light-theme values are darker than a stock
 shadcn palette for exactly this reason.
 
 This is not a claim you have to take on trust, and it is not a claim that rots:
@@ -512,17 +512,20 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 48 tests — the parser, the scroll logic, and the components
-npm run check:tokens    # no literal colours, no raw z-index, no one-off type sizes
+npm test                # 137 tests — every component mounts, plus the behaviour above
+npm run check:tokens    # no literal colours, no raw z-index, no markup from content
 npm run check:contrast  # the palette, measured against tokens.css
+npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't
 ```
 
 CI runs the same steps on Node 20, 22 and 24, and deploys the gallery to Pages on every
 push to `main`.
 
-The component tests are aimed at the failures this repo has actually had rather than at
-coverage: that every overlay opens without taking the page down with it, that a `Field`
+Every component is mounted once by `test/smoke.test.tsx`, overlays in their open state,
+and the case list is checked against the directory so a new component cannot arrive
+without one. That is the cheap half. The rest is aimed at the failures this repo has
+actually had rather than at coverage: that every overlay opens without taking the page down with it, that a `Field`
 really does associate its label, hint and error with the control, that the composer does
 not send mid-IME-composition. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
 enforced, and [CHANGELOG.md](./CHANGELOG.md) — which, for a copy-in template, is the only
