@@ -153,13 +153,41 @@ The suite is aimed at the failures this repo has actually had, not at a coverage
   progress bar that reports no number when it has none.
 - **the rules with a reason.** The composer not sending mid-IME-composition; the reveal
   toggle not submitting the form it sits in.
+- **keyboard and focus.** `test/keyboard.test.tsx`: Tab stays inside an open dialog,
+  Escape puts focus back on the trigger, a toolbar is one tab stop with arrow keys
+  inside it, a combobox moves its highlight without moving focus off the input. These
+  behaviours come from Base UI, which means they can regress on a version bump without
+  a line of this repo changing — and nothing else here would notice.
 
 `src/lib/markdown.ts` is pure and covered separately. If you touch the parser, add a case
 — especially for what is *not* interpreted. Links are never turned into anchors and fence
 content is never parsed; both are security properties, not style choices.
 
-A test that cannot fail is worth nothing. When you add one, break the thing it covers and
-watch it go red before you commit.
+### A test that cannot fail is worth nothing
+
+Break the thing it covers and watch it go red before you commit. This is not a figure of
+speech — three tests in this repo were green with the behaviour deleted. One asserted a
+guard that had already been removed (the assertion ran a microtask too early); another
+used a negative regex over the whole document body and passed with the element it was
+looking for replaced by a literal string.
+
+So it is a script rather than advice:
+
+```bash
+npm run verify:tests
+```
+
+It breaks one behaviour in `src/` at a time — a primitive swapped for a plain `<div>`, a
+prop that turns off the focus trap, an `aria-*` value hardcoded — runs the single test
+that names it, and expects a failure. `MISSED` means the test is not holding what its
+name says. It edits files and puts them back, including on Ctrl-C, and refuses to start
+if those files already have uncommitted changes.
+
+When you add a test to `test/keyboard.test.tsx`, add its injection to
+`scripts/verify-tests.mjs`. Choose a regression somebody could plausibly commit, not
+damage for its own sake — the injection is a claim about how the behaviour would really
+be lost. If an injection stops applying because the source moved, the script says
+`STALE` rather than passing quietly.
 
 ## Accessibility
 

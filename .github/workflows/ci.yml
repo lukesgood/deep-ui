@@ -39,6 +39,9 @@ jobs:
       - name: Tests
         run: npm test
 
+      - name: Do the tests fail when the behaviour is removed
+        run: npm run verify:tests
+
       - name: Token discipline
         run: npm run check:tokens
 

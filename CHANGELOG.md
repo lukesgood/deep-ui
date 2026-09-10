@@ -53,6 +53,21 @@ your own copy, not just what moved in this repo.
 
 ### Added
 
+- **`test/keyboard.test.tsx`** — twelve tests covering the half of the accessibility
+  audit list that does not need a person. Tab stays inside an open dialog; Dialog,
+  AlertDialog and Sheet all return focus to the trigger; a combobox moves
+  `aria-activedescendant` without moving focus off the input; Accordion, Collapsible,
+  Toggle and Tabs report their state; a toolbar is one tab stop with arrow keys inside;
+  a `Field` error reaches the control through `aria-describedby`, *after* the
+  description. Every other test in this repo renders and reads an attribute, which
+  cannot catch any of this — and all of it comes from Base UI, so it can regress on a
+  version bump with nothing here changing.
+  **In your copy:** nothing to do; no component changed.
+- **`scripts/verify-tests.mjs`** (`npm run verify:tests`) — breaks one behaviour in
+  `src/` at a time and expects the test that names it to fail. Three tests in this repo
+  had been green with the behaviour deleted, so the discipline is a script now instead
+  of a line of advice in CONTRIBUTING. Runs in CI. Twelve injections, all caught.
+
 - **`@media (prefers-contrast: more)`** in `tokens.css`. Three tokens move and the rest
   stay: `--muted-foreground` to AAA (7:1), `--border` to the 3:1 that identifies a
   control, `--input` past it. Hue and saturation are unchanged; only lightness. Raising

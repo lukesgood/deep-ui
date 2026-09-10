@@ -593,25 +593,30 @@ One thing checked while fixing those, because it would have made the tooltip gap
 a sidebar collapsed to icons keeps its buttons' names. The label is clipped by `overflow`,
 not removed from the accessibility tree.
 
-**Needs a person with a screen reader.** Ordered by how badly it goes wrong when it is
-wrong:
+**Three of these are now held by tests**, because half of this list turns out to be facts
+about the DOM rather than facts about what a reader says out loud. "Does Escape return
+focus to the trigger" is answerable without a screen reader; "does a streaming answer
+announce once or forty times" is not. `test/keyboard.test.tsx` takes the answerable half,
+and `npm run verify:tests` breaks each behaviour in turn to confirm those tests would
+actually notice.
+
+| | held by a test | still needs a person |
+|---|---|---|
+| **Focus** | Tab stays inside an open Dialog; Dialog, AlertDialog and Sheet all return focus to the trigger; Combobox moves `aria-activedescendant` without moving focus off the input | whether the place focus lands *reads* sensibly; the sidebar's mobile Sheet |
+| **State** | Accordion and Collapsible `aria-expanded`; Toggle `aria-pressed`; ToggleGroup as one tab stop with arrow keys inside; Tabs selection, and that arrowing does not activate | whether the panel is announced on switch; the sidebar's own collapsed state |
+| **Forms** | a `Field` error reaches the control through `aria-describedby`, after the description rather than before it; `PasswordInput`'s toggle renames itself when the password shows | whether a `Fieldset` legend is announced when focus enters the group |
+
+**Still needs a person with a screen reader.** Ordered by how badly it goes wrong when it
+is wrong:
 
 - **Live regions.** Does a streaming answer in `Conversation` announce once when it
   settles, or on every token? Does a `Toast` interrupt appropriately — errors as `alert`,
   the rest as `status` — and does a burst of three announce as three? Does
-  `ConversationPending` say anything useful?
-- **Focus.** Dialog, AlertDialog and Sheet: is focus trapped, and does it return to the
-  trigger on close? Does the sidebar's mobile Sheet return focus to the trigger? Does
-  Combobox keep focus in the input while `aria-activedescendant` moves?
+  `ConversationPending` say anything useful? (`test/live-region.test.tsx` establishes the
+  DOM half: a streaming answer changes text in place and adds no nodes.)
 - **Naming.** Every icon-only control: `SidebarTrigger`, `ComposerSubmit`,
   `ConversationActions`, the toast dismiss, the pagination arrows. Does `OtpField`
   announce which box you are in?
-- **State.** Accordion and Collapsible expanded/collapsed; Toggle and ToggleGroup pressed;
-  the sidebar's own collapsed state; which Tab is selected and whether the panel is
-  announced on switch.
-- **Forms.** Does a `Field` error reach the reader on submit, and is the description read
-  before it? Is a `Fieldset` legend announced when focus enters the group? Does
-  `PasswordInput`'s toggle read its pressed state?
 - **Reading order.** In `templates/assistant-shell`, does the docked panel come after the
   main content or interrupt it? Does the citation list read in a sensible place relative
   to the answer that cites it?
@@ -685,10 +690,12 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 151 tests — every component mounts, plus the behaviour above
+npm test                # 163 tests — every component mounts, plus the behaviour above
+npm run verify:tests    # breaks the code on purpose; the tests have to notice
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have
 npm run check:contrast  # the palette, measured against tokens.css
+npm run check:selectors # rules in tokens.css that point at nothing
 npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't
 npm run size            # what copying a component costs, rebuilt from scratch
@@ -702,7 +709,18 @@ and the case list is checked against the directory so a new component cannot arr
 without one. That is the cheap half. The rest is aimed at the failures this repo has
 actually had rather than at coverage: that every overlay opens without taking the page down with it, that a `Field`
 really does associate its label, hint and error with the control, that the composer does
-not send mid-IME-composition. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
+not send mid-IME-composition.
+
+`test/keyboard.test.tsx` is the half of the accessibility list below that does not need a
+person: that Tab stays inside an open dialog, that Escape puts focus back on the control
+you opened it from, that a toolbar is one tab stop with arrow keys inside it, that a
+combobox moves its highlight without moving focus off the input.
+
+And `npm run verify:tests` asks the question one level up — *does each of those tests
+fail when you remove the thing it covers?* It breaks one behaviour in `src/` at a time,
+runs the single test that names it, and expects a failure. Three tests in this repo were
+found to be green with the behaviour deleted; that is why this is a script and not a
+paragraph of advice. See [CONTRIBUTING.md](./CONTRIBUTING.md) for what is
 enforced, and [CHANGELOG.md](./CHANGELOG.md) — which, for a copy-in template, is the only
 upgrade path there is.
 
