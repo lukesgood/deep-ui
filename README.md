@@ -469,6 +469,35 @@ there is otherwise tree-shaken and the screen renders unstyled.
 
 ---
 
+## What it costs
+
+Measured, not estimated — `npm run size` rebuilds these, and `npm run size -- --all`
+does it per primitive. Minified, excluding the react + react-dom floor every app pays
+anyway. Gzip is roughly a third of each; the ratios are what the decision turns on.
+
+| | |
+|---|---|
+| `clsx`, `cva`, one Lucide icon | **~0.5–2 kB each** — noise |
+| a Base UI control with no popup | **~14 kB** |
+| **`tailwind-merge`** | **~79 kB**, paid once |
+| **a Base UI popup** — its positioning engine | **~193 kB**, paid once |
+
+The two large numbers are what matter, and both are paid once rather than per
+component. `cn()` pulls `tailwind-merge`, so it lands the moment you copy any styled
+primitive. The popup tier lands with the first of `dialog`, `sheet`, `popover`,
+`tooltip`, `dropdown-menu`, `context-menu`, `select`, `combobox`, `navigation-menu`,
+`menubar` or `preview-card` — a second one adds about 70 kB, not another 193.
+
+So the useful shape is three tiers, not forty-nine numbers: **markdown** and
+**error-box** cost about 12 kB and nothing else; anything styled adds `tailwind-merge`
+once; anything that floats adds the positioning engine once.
+
+If 79 kB for a class-merging helper is not a trade you want, `cn()` is six lines in
+`lib/utils.ts` and `twMerge` is the only part you would be replacing. Every component
+imports it, so it is one edit in one file.
+
+---
+
 ## Accessibility
 
 **What the palette guarantees.** Every foreground/background pair the tokens can produce
@@ -617,12 +646,13 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 148 tests — every component mounts, plus the behaviour above
+npm test                # 151 tests — every component mounts, plus the behaviour above
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't
+npm run size            # what copying a component costs, rebuilt from scratch
 ```
 
 CI runs the same steps on Node 20, 22 and 24, and deploys the gallery to Pages on every

@@ -27,7 +27,8 @@
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm test && npm run check:tokens && npm run check:portable && npm run check:contrast && npm run check:docs && npm run demo:build",
     "demo": "npm run dev -w deep-ui-demo",
-    "demo:build": "npm run build -w deep-ui-demo"
+    "demo:build": "npm run build -w deep-ui-demo",
+    "size": "node scripts/measure-size.mjs"
   },
   "comment": "Not published. This package.json exists so the template can be type-checked standalone, and so it doubles as the exact dependency list a consuming app must install.",
   "dependencies": {

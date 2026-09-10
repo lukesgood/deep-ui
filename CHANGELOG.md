@@ -19,6 +19,15 @@ your own copy, not just what moved in this repo.
   scaffolding an app and copying `src/` into it, which nobody had done. The repo's own
   `tsconfig.json` now uses those options, so it cannot happen again.
   **In your copy:** re-copy those four files.
+- `scripts/measure-size.mjs` (`npm run size`) — what copying a component actually
+  costs, as a real build minus the React floor. The answer is three tiers rather than
+  forty-nine numbers, and it is now in the README: `tailwind-merge` is ~79 kB paid
+  once, a Base UI popup's positioning engine is ~193 kB paid once, everything else is
+  noise.
+- Tests for the streaming live region — the first item on the screen-reader audit list,
+  taken as far as it can be without a screen reader. A streaming answer changes text in
+  place and adds no nodes, which is what `aria-relevant="additions"` makes the
+  difference between one announcement and forty.
 - `scripts/check-portable.mjs` (`npm run check:portable`) — every import under `src/`
   must resolve inside the copied tree or to a package the README tells people to
   install. A relative path climbing out of `src/`, or a devDependency that happens to
