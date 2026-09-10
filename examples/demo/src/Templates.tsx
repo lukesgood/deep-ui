@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { AssistantShell } from "../../../templates/assistant-shell"
+import { Profile } from "../../../templates/profile"
 import { Settings } from "../../../templates/settings"
 import { SignIn } from "../../../templates/sign-in"
 
@@ -9,6 +10,7 @@ import { SignIn } from "../../../templates/sign-in"
  *  so what you see here is what you would get by copying the file. */
 export const TEMPLATES = [
   { id: "sign-in", title: "Sign in", render: SignIn },
+  { id: "profile", title: "Your account", render: Profile },
   { id: "settings", title: "Settings", render: Settings },
   { id: "assistant-shell", title: "Assistant shell", render: AssistantShell },
 ] as const

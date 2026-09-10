@@ -337,12 +337,19 @@ what you see in the gallery is what you get from the file.
 | | |
 |---|---|
 | [`sign-in`](templates/sign-in.tsx) | Passkey, password and a sign-in link, with a second factor — one card, five steps |
+| [`profile`](templates/profile.tsx) | Identity, passkeys, active sessions, and the end of the road |
 | [`settings`](templates/settings.tsx) | Tabs, grouped fields, and a save bar that appears only once something changed |
 | [`assistant-shell`](templates/assistant-shell.tsx) | An app shell with the assistant docked on the right |
 
 Each is a starting point, not a component — copy it and change everything. What is worth
 keeping is the wiring, which is invisible when right and expensive when wrong. Two things
 they demonstrate that are easy to get backwards:
+
+**Show people their passkeys and their sessions.** `profile` lists both, because they
+are what someone came to the account screen to change after losing a laptop, and most
+products bury them. The two details that make those lists usable: the current session says
+so — "end anything you do not recognise" is a guess otherwise — and removing your *last*
+passkey warns differently from removing a spare.
 
 **Passkeys need one thing from the markup.** `autoComplete="username webauthn"` on the
 email field is what lets the browser offer a saved passkey from the field itself; without

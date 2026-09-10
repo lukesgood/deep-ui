@@ -2,22 +2,28 @@
 
 import * as React from "react"
 import {
-  Database, LayoutDashboard, PanelRight, Settings2, Table2, Workflow,
+  ChevronsUpDown, Database, LayoutDashboard, LogOut, PanelRight, Settings2,
+  Table2, User, Workflow,
 } from "lucide-react"
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Citation, Citations } from "@/components/ui/citations"
 import { Composer, ComposerInput, ComposerSubmit } from "@/components/ui/composer"
 import {
   Conversation, ConversationMessage, ConversationPending,
 } from "@/components/ui/conversation"
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { Markdown } from "@/components/ui/markdown"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import {
-  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarHeader,
-  SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider,
-  SidebarRail, SidebarTrigger,
+  Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent,
+  SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarProvider, SidebarRail, SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -123,6 +129,67 @@ function AssistantPanel() {
   )
 }
 
+/** The account control every app shell has and this one did not.
+ *
+ *  It reads as one row — picture, name, address — and opens a menu, which is what
+ *  makes it findable: people look bottom-left for their own account, and they look
+ *  for their own face. Collapsed to icons the text is clipped rather than removed,
+ *  so the button keeps its name for a screen reader.
+ *
+ *  The menu repeats the name and address at the top. That is not decoration: on a
+ *  shared machine it is the only confirmation of *which* account is about to be
+ *  signed out. */
+function UserMenu() {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <SidebarMenuButton
+                size="lg"
+                tooltip="Luke Ham"
+                className="data-[popup-open]:bg-sidebar-accent"
+              />
+            }
+          >
+            <Avatar className="size-7 shrink-0">
+              <AvatarImage src="https://example.invalid/nope.png" alt="" />
+              <AvatarFallback className="dp-gradient text-2xs font-semibold text-white">
+                LH
+              </AvatarFallback>
+            </Avatar>
+            <span className="grid min-w-0 flex-1 text-left leading-tight">
+              <span className="truncate text-sm font-medium">Luke Ham</span>
+              <span className="truncate text-xs text-muted-foreground">luke@example.com</span>
+            </span>
+            <ChevronsUpDown className="ml-auto size-4 shrink-0 text-muted-foreground" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-56">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="font-normal">
+                <span className="block truncate text-sm font-medium text-foreground">Luke Ham</span>
+                <span className="block truncate text-xs">luke@example.com</span>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User /> Your account
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings2 /> Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <LogOut /> Sign out
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  )
+}
+
 export function AssistantShell() {
   const isMobile = useIsMobile()
   const [assistantOpen, setAssistantOpen] = React.useState(true)
@@ -156,6 +223,9 @@ export function AssistantShell() {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent>
+        <SidebarFooter>
+          <UserMenu />
+        </SidebarFooter>
         <SidebarRail />
       </Sidebar>
 

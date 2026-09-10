@@ -14,6 +14,12 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **`templates/profile.tsx`** — the account screen the set had no version of: identity
+  with a gradient initials avatar, a passkey list with per-device dates, active sessions
+  with the current one named, and account deletion. Every destructive action goes through
+  `useConfirm()`.
+- **A user menu in the app shell.** `assistant-shell` had no sidebar footer at all;
+  it now carries the avatar/name/email row and menu that every app shell has.
 - **`sign-in` gained passkey and sign-in-link routes**, and was rebuilt to look like
   the rest of the system: the gradient runs under the card as a wash rather than
   appearing only on a 40px logo tile, the heading uses `.dp-gradient-text`, and the card
