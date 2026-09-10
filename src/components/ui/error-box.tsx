@@ -24,7 +24,9 @@ export function ErrorBox({ msg, action, hint, className = "" }: {
   return (
     <div className={`rounded-md border border-[var(--dp-bad)]/30 bg-[var(--dp-bad)]/10 px-3 py-2 text-xs text-[var(--dp-bad-text)] space-y-1 ${className}`}>
       <div className="flex items-start gap-2">
-        <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" /><span>{msg}</span>
+        <AlertCircle className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+        {/* The message is whatever the server said, in whatever language it says it. */}
+        <span dir="auto">{msg}</span>
       </div>
       {action && <div className="pl-6 pt-1">{action}</div>}
       {hint && <div className="pl-6">{hint}</div>}

@@ -71,9 +71,13 @@
      exposes --font-inter):  html { --dp-font-sans: var(--font-inter); }
      The source vars are named distinctly so nothing self-references; the
      fallback stacks keep the template usable before any font is wired up. */
-  --font-sans: var(--dp-font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif);
-  --font-mono: var(--dp-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
-  --font-heading: var(--dp-font-heading, var(--dp-font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif));
+  /* The CJK names are the tail of the stack, not decoration: `system-ui` resolves to
+     Segoe UI on Windows, which has no Hangul or kana at all, so Korean and Japanese
+     fall through to whatever `sans-serif` happens to be — usually something with the
+     wrong weight and metrics. */
+  --font-sans: var(--dp-font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", "Yu Gothic UI", "Microsoft YaHei", sans-serif);
+  --font-mono: var(--dp-font-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, "D2Coding", monospace);
+  --font-heading: var(--dp-font-heading, var(--font-sans));
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -247,6 +251,23 @@
     @apply font-sans;
   }
   h1, h2, h3 { letter-spacing: -0.02em; }
+
+  /* Line breaking, per script. Scoped by :lang() so none of it reaches a language
+     that does not want it — which means the page has to set `lang`, and should
+     anyway.
+
+     Korean breaks between 어절, not between arbitrary characters. Without keep-all a
+     Korean sentence wraps mid-word, which reads as a typo rather than a line break.
+     Japanese and Chinese want the strict rules for small kana and punctuation, which
+     stop a line ending on a character that may not start or end one. */
+  :lang(ko) {
+    word-break: keep-all;
+    overflow-wrap: break-word; /* a URL or an identifier still has to fit */
+  }
+  :lang(ja),
+  :lang(zh) {
+    line-break: strict;
+  }
 }
 
 /* ── Deep utilities ────────────────────────────────────────────────────── */

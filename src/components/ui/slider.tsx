@@ -20,7 +20,7 @@ function SliderLabel({ className, ...props }: SliderPrimitive.Label.Props) {
   return (
     <SliderPrimitive.Label
       data-slot="slider-label"
-      className={cn("text-sm leading-none font-medium select-none", className)}
+      className={cn("text-sm leading-tight font-medium select-none", className)}
       {...props}
     />
   )

@@ -31,11 +31,15 @@ export function Markdown({
   className?: string
 }) {
   const blocks = parseBlocks(text, citations)
+  // `dir="auto"` per block rather than once on the wrapper: this renders text nobody
+  // here wrote — model output, or prose pulled from a document — and a single answer
+  // can hold an English paragraph and an Arabic one. Direction is a property of each
+  // block, and the browser infers it from the first strong character.
   return (
     <div className={`space-y-2 ${className}`}>
       {blocks.map((b, i) => {
         if (b.t === "pre") return (
-          <pre key={i} className="overflow-x-auto rounded-md border bg-muted/50 p-2 font-mono text-2xs leading-relaxed">
+          <pre key={i} dir="auto" className="overflow-x-auto rounded-md border bg-muted/50 p-2 font-mono text-2xs leading-relaxed">
             {b.v}
           </pre>
         )
@@ -47,22 +51,22 @@ export function Markdown({
           const level = Math.min(baseHeadingLevel + b.level - 1, 6)
           const Heading = `h${level}` as "h1" | "h2" | "h3" | "h4" | "h5" | "h6"
           return (
-            <Heading key={i} className={`${size} font-semibold`}>
+            <Heading key={i} dir="auto" className={`${size} font-semibold`}>
               <Spans spans={b.spans} citationHref={citationHref} />
             </Heading>
           )
         }
         if (b.t === "ul") return (
-          <ul key={i} className="list-disc space-y-0.5 pl-4">
+          <ul key={i} dir="auto" className="list-disc space-y-0.5 pl-4">
             {b.items.map((it, j) => <li key={j}><Spans spans={it} citationHref={citationHref} /></li>)}
           </ul>
         )
         if (b.t === "ol") return (
-          <ol key={i} className="list-decimal space-y-0.5 pl-4">
+          <ol key={i} dir="auto" className="list-decimal space-y-0.5 pl-4">
             {b.items.map((it, j) => <li key={j}><Spans spans={it} citationHref={citationHref} /></li>)}
           </ol>
         )
-        return <p key={i} className="whitespace-pre-wrap"><Spans spans={b.spans} citationHref={citationHref} /></p>
+        return <p key={i} dir="auto" className="whitespace-pre-wrap"><Spans spans={b.spans} citationHref={citationHref} /></p>
       })}
     </div>
   )
@@ -79,7 +83,7 @@ export function Spans({ spans, citationHref }: {
         if (s.t === "bold") return <strong key={i} className="font-semibold text-foreground">{s.v}</strong>
         if (s.t === "italic") return <em key={i}>{s.v}</em>
         if (s.t === "code") return (
-          <code key={i} className="rounded bg-muted px-1 py-px font-mono text-[0.9em]">{s.v}</code>
+          <code key={i} dir="auto" className="rounded bg-muted px-1 py-px font-mono text-[0.9em]">{s.v}</code>
         )
         if (s.t === "cite") {
           const badge = "mx-0.5 inline-flex items-center rounded bg-primary/10 px-1 py-px align-baseline text-2xs font-semibold text-primary"

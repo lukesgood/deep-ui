@@ -85,3 +85,40 @@ test("every default is a non-empty string", () => {
     expect(value.trim(), key).not.toBe("")
   }
 })
+
+/* ── direction ────────────────────────────────────────────────────────────── */
+
+test("text the component did not write carries dir=auto", async () => {
+  const { Markdown } = await import("@/components/ui/markdown")
+  const { container } = render(<Markdown text={"# عنوان\n\nنص عربي مع events_raw"} />)
+
+  // Per block, not once on the wrapper: one answer can hold an English paragraph and
+  // an Arabic one, and direction belongs to each.
+  const heading = container.querySelector("h3")!
+  const paragraph = container.querySelector("p")!
+  expect(heading.getAttribute("dir")).toBe("auto")
+  expect(paragraph.getAttribute("dir")).toBe("auto")
+
+  // The browser resolves it from the first strong character, so an Arabic paragraph
+  // lays out right-to-left without anyone declaring a page language.
+  expect(paragraph.textContent).toContain("events_raw")
+})
+
+test("a conversation turn is isolated from its neighbours", async () => {
+  const { Conversation, ConversationMessage } = await import("@/components/ui/conversation")
+  render(
+    <Conversation>
+      <ConversationMessage from="user">ما الذي يقرأ events_raw؟</ConversationMessage>
+      <ConversationMessage from="assistant">The hourly rollup does.</ConversationMessage>
+    </Conversation>
+  )
+  const bubbles = document.querySelectorAll('[data-slot="conversation-message"] > div[dir]')
+  expect(bubbles).toHaveLength(2)
+  for (const b of bubbles) expect(b.getAttribute("dir")).toBe("auto")
+})
+
+test("an error message is shown in whatever direction the server wrote it", async () => {
+  const { ErrorBox } = await import("@/components/ui/error-box")
+  render(<ErrorBox msg="فشل الاتصال" />)
+  expect(screen.getByText("فشل الاتصال").getAttribute("dir")).toBe("auto")
+})

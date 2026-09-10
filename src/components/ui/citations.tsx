@@ -67,11 +67,17 @@ function Citation({
         {index}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-medium">{title}</span>
+        {/* `title` because the text is clipped: a source nobody can read the
+            name of is not a citation. */}
+        <span dir="auto" title={title} className="block truncate text-xs font-medium">
+          {title}
+        </span>
         {location && (
           <span className="mt-0.5 flex items-center gap-1 text-2xs text-muted-foreground">
             <FileText className="size-3 shrink-0" />
-            <span className="truncate">{location}</span>
+            <span dir="auto" title={location} className="truncate">
+              {location}
+            </span>
           </span>
         )}
       </span>

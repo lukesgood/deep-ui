@@ -10,6 +10,16 @@ your own copy, not just what moved in this repo.
 
 ## [Unreleased]
 
+### Changed
+
+- `leading-none` on labels and titles became `leading-tight`. A line-height of exactly
+  1 leaves no room for the marks Thai, Vietnamese and Devanagari put above and below
+  the line, and clips them.
+  **In your copy:** affects `card`, `dialog`, `field`, `label`, `slider`.
+- A truncated `Citation` title or location now carries a `title` attribute — a source
+  whose name nobody can read is not a citation. `PreviewCard` gained
+  `max-w-(--available-width)` so it fits a narrow viewport.
+
 ### Added
 
 - **`src/lib/strings.tsx`** — every word the components say on their own, in one
@@ -22,6 +32,11 @@ your own copy, not just what moved in this repo.
   Affected: `breadcrumb`, `citations`, `combobox`, `composer`, `conversation`,
   `dialog`, `number-field`, `pagination`, `password-input`, `sheet`, `sidebar`, plus
   `lib/toast.tsx` and `lib/confirm.tsx`.
+- **Script-aware line breaking**: `word-break: keep-all` for `:lang(ko)`,
+  `line-break: strict` for `:lang(ja)` and `:lang(zh)`, and CJK faces at the end of the
+  font stack — `system-ui` is Segoe UI on Windows, which has no Hangul or kana.
+- **`dir="auto"` on text the components did not write**: `Markdown` per block,
+  `ConversationMessage`, `ErrorBox`'s message, and a `Citation`'s title and location.
 - `check:tokens` gained a rule that fails on a literal `aria-label`, `title` or
   `placeholder` in `src/`, so the next component cannot reintroduce one. `templates/`
   is exempt: its words are example copy.

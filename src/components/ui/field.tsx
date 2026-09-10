@@ -39,7 +39,7 @@ function FieldLabel({ className, ...props }: FieldPrimitive.Label.Props) {
     <FieldPrimitive.Label
       data-slot="field-label"
       className={cn(
-        "flex items-center gap-2 text-sm leading-none font-medium select-none",
+        "flex items-center gap-2 text-sm leading-tight font-medium select-none",
         "group-has-disabled/field:opacity-50",
         className
       )}

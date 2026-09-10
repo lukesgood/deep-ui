@@ -313,6 +313,34 @@ component cannot quietly reintroduce one.
 `templates/` is exempt: a template is example code, and its words are meant to be
 rewritten rather than translated.
 
+### Script and direction
+
+Two things the components do so an app does not have to remember to:
+
+**Line breaking follows the language, when the page declares one.** Korean breaks
+between 어절, not between arbitrary characters — without `word-break: keep-all` a
+Korean sentence wraps mid-word, which reads as a typo rather than a line break.
+Japanese and Chinese get the strict rules for small kana and punctuation. Both are
+scoped by `:lang()`, so nothing reaches a language that does not want it, and both
+depend on your page setting `lang` — which it should anyway.
+
+The font stack ends in CJK faces for the same reason: `system-ui` resolves to Segoe UI
+on Windows, which has no Hangul or kana at all.
+
+**Text the components did not write carries `dir="auto"`.** `Markdown` (per block, so
+one answer can hold an English paragraph and an Arabic one), `ConversationMessage`,
+`ErrorBox`'s message, and a `Citation`'s title and location. All four render content
+from somewhere else — a model, a server, an ingested document — and the browser can
+work out the direction from the first strong character where a hardcoded `dir` cannot.
+
+Labels use `leading-tight` rather than `leading-none`: a line-height of exactly 1 leaves
+no room for the marks Thai, Vietnamese and Devanagari put above and below the line, and
+clips them.
+
+RTL layout itself is **not** done — the components still use physical properties
+(`pl-`, `border-l`) rather than logical ones in about a hundred places, so an
+`dir="rtl"` page will lay out left-to-right. That is a known gap, not a claim.
+
 ### Assistant panels
 
 `markdown.tsx` was always half of an assistant panel — it renders the subset a model
@@ -549,7 +577,7 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 143 tests — every component mounts, plus the behaviour above
+npm test                # 146 tests — every component mounts, plus the behaviour above
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe
