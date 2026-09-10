@@ -39,6 +39,11 @@ It lives in `examples/demo` and imports the template through the `@/*` alias poi
 `../../src`, so nothing is copied — what the page shows is the source in this repo, and it
 cannot drift from it.
 
+Every panel has a **Code** button, and that snippet cannot drift either. It is not written
+anywhere: a Vite plugin reads the JSX children of each panel out of the gallery source at
+build time, so the code under an example is the same characters that produced the thing
+above it. Nobody maintains 40 snippets by hand, which is the only reason they stay true.
+
 ```bash
 npm install     # workspace install, covers the template and the demo
 npm run demo    # http://localhost:5173

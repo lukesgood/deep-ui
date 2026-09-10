@@ -53,6 +53,15 @@ your own copy, not just what moved in this repo.
 
 ### Added
 
+- **Every gallery panel now shows its own source**, under a Code button with a copy
+  action. The snippet is not written anywhere: `examples/demo/vite-plugin-panel-source.ts`
+  reads the JSX children of each `<Panel>` out of the gallery at build time, so the code
+  under an example is the same characters that produced it. Forty snippets maintained by
+  hand would be stale by the second edit. The gallery answered "what does this look
+  like" and never "how do I write it", which is the question somebody copying a component
+  actually has.
+  **In your copy:** nothing to do; the demo is not part of what you copy.
+
 - **ESLint** (`npm run lint`), for the two things the scripts in `scripts/` cannot see:
   `jsx-a11y` for accessibility mistakes visible in the source, and `react-hooks` for
   stale closures. No style rules and no formatter. It found one thing on the first run:

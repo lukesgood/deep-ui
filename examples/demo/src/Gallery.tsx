@@ -1,7 +1,7 @@
 import * as React from "react"
 import {
-  ArrowUpRight, Bold, CircleAlert, Copy, Database, Inbox, Italic, List,
-  MoreHorizontal, Pencil, RefreshCw, Trash2, TriangleAlert, Underline,
+  ArrowUpRight, Bold, Check, ChevronDown, CircleAlert, Copy, Database, Inbox,
+  Italic, List, MoreHorizontal, Pencil, RefreshCw, Trash2, TriangleAlert, Underline,
 } from "lucide-react"
 
 import {
@@ -104,10 +104,15 @@ import { useToast } from "@/lib/toast"
 
 /* ───────────────────────────── page furniture ───────────────────────────── */
 
-function Panel({ title, note, children, className = "" }: {
+/** `source` is not written by hand and is not a prop anybody passes. The Vite plugin
+ *  in `vite-plugin-panel-source.mjs` reads the JSX children of every `<Panel>` out of
+ *  this file at build time and passes them in — so the snippet under an example is the
+ *  same characters that produced it, and cannot drift from it. */
+function Panel({ title, note, children, source, className = "" }: {
   title: string
   note?: string
   children: React.ReactNode
+  source?: string
   className?: string
 }) {
   return (
@@ -117,7 +122,55 @@ function Panel({ title, note, children, className = "" }: {
         {note && <CardDescription className="text-xs">{note}</CardDescription>}
       </CardHeader>
       <CardContent className="p-4 pt-0">{children}</CardContent>
+      {source && <PanelSource source={source} title={title} />}
     </Card>
+  )
+}
+
+/** The example's own source, folded away until asked for. Collapsed by default: the
+ *  gallery's first job is to show the components working, and forty open code blocks
+ *  would bury that. */
+function PanelSource({ source, title }: { source: string; title: string }) {
+  const [copied, setCopied] = React.useState(false)
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(source)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      // Clipboard access can be refused, and a button that silently does nothing is
+      // its own bug — leave the state alone so the label keeps saying "Copy".
+    }
+  }
+
+  return (
+    <Collapsible>
+      <div className="flex items-center justify-between border-t px-4 py-1.5">
+        <CollapsibleTrigger
+          render={<Button variant="ghost" size="sm" className="-ms-2 h-6 gap-1 px-2 text-xs font-normal text-muted-foreground [&[data-panel-open]>svg]:rotate-180" />}
+        >
+          <ChevronDown className="size-3 transition-transform" />
+          Code
+        </CollapsibleTrigger>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="-me-2 h-6 gap-1 px-2 text-xs font-normal text-muted-foreground"
+          onClick={copy}
+          aria-label={`Copy the ${title} example`}
+        >
+          {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+          {copied ? "Copied" : "Copy"}
+        </Button>
+      </div>
+      <CollapsibleContent>
+        {/* The block scrolls on its own rather than pushing the page sideways. */}
+        <pre className="overflow-x-auto border-t bg-muted/40 px-4 py-3 text-2xs leading-relaxed">
+          <code className="font-mono">{source}</code>
+        </pre>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }
 

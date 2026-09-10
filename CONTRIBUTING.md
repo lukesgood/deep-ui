@@ -89,6 +89,19 @@ screen reader, who has no way to report a bug nobody else can see.
 `check:tokens` fails on a literal `aria-label`, `title` or `placeholder` in `src/`.
 `templates/` is exempt — a template's words are example copy, meant to be rewritten.
 
+### Gallery snippets are never written by hand
+
+Each panel in `examples/demo/src/Gallery.tsx` shows its own source under a **Code**
+button. Do not add a `source` prop — `vite-plugin-panel-source.ts` reads the JSX children
+of every `<Panel>` out of the file at build time and passes them in. Writing the snippet
+by hand means writing every example twice, and the copy goes stale the first time either
+one is edited.
+
+It parses rather than pattern-matches, because a `>` inside a string or a ternary in an
+attribute is something a regex gets wrong quietly. Adding a panel needs nothing; a panel
+with no children fails the build, since a Code button that opens onto an empty box is
+worse than no button.
+
 ### The linter covers what the scripts cannot
 
 ```bash
