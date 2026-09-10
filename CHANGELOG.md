@@ -39,7 +39,9 @@ your own copy, not just what moved in this repo.
   purpose. New `--dp-flip` token carries the sign for transforms, which have no logical
   equivalent.
   **In your copy:** re-copy the component files; nothing changes in LTR.
-  *Known gap:* `Switch`'s thumb still slides rightward in RTL and overshoots its track.
+- **`Switch`'s thumb is positioned, not translated.** `inset-inline-start` resolves
+  against the writing direction, where a transform does not — the thumb used to travel
+  rightward in both and overshoot its track under `dir="rtl"`.
 - **Dates in `templates/profile.tsx`** use `Intl.DateTimeFormat` and
   `Intl.RelativeTimeFormat` inside `<time datetime>`, instead of English strings.
 - **Script-aware line breaking**: `word-break: keep-all` for `:lang(ko)`,

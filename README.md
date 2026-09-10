@@ -354,10 +354,11 @@ For anything that *slides*, CSS has no logical transform, so `--dp-flip` carries
 sign: `translate-x-[calc(8px*var(--dp-flip))]` moves toward the end of the line in
 whichever direction the line runs.
 
-One known gap: `Switch`'s thumb still travels rightward in both directions, so it
-overshoots its track under `dir="rtl"`. Both a `ltr:`/`rtl:` pair and `--dp-flip` were
-tried — `--tw-translate-x` computes to the negative value and the element lays out as
-though it were positive — and it was left alone rather than shipped half-fixed.
+`Switch` was the exception and is no longer: its thumb is *positioned* with
+`inset-inline-start` rather than translated. A transform has no logical form, so the
+thumb travelled rightward in both directions and overshot its track under `dir="rtl"`;
+an inset resolves against the writing direction with no sign to get wrong, and animates
+just as well.
 
 ### Assistant panels
 
@@ -595,7 +596,7 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 147 tests — every component mounts, plus the behaviour above
+npm test                # 148 tests — every component mounts, plus the behaviour above
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe

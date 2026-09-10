@@ -4,12 +4,19 @@ import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
 
 import { cn } from "@/lib/utils"
 
-/** Known gap: the thumb slides toward the right in both directions, so in RTL it
- *  travels the wrong way and overshoots the track. Both a `ltr:`/`rtl:` variant pair
- *  and a `--dp-flip` multiplier were tried; in each case `--tw-translate-x` computes
- *  to the negative value, and the element still lays out as though it were positive.
- *  Left as it was rather than shipped half-fixed. Everything else in this file — the
- *  track, the focus ring, the hit area — is direction-agnostic. */
+/** The thumb is positioned, not translated.
+ *
+ *  `translate-x` moves toward the right in both directions, so under `dir="rtl"` the
+ *  thumb travelled the wrong way and overshot its track. Flipping the sign — with a
+ *  `ltr:`/`rtl:` variant pair, and again with a `--dp-flip` multiplier — changed
+ *  `--tw-translate-x` and moved nothing.
+ *
+ *  `inset-inline-start` has no such problem: it *is* the logical property, so the
+ *  browser resolves it against the writing direction and there is no sign to get
+ *  wrong. It animates as well as a transform would.
+ *
+ *  The distances are the track's content box minus the thumb: 32px − 2px border −
+ *  16px thumb = 14px, and 24 − 2 − 12 = 10px for the small one. */
 function Switch({
   className,
   size = "default",
@@ -29,7 +36,7 @@ function Switch({
     >
       <SwitchPrimitive.Thumb
         data-slot="switch-thumb"
-        className="pointer-events-none block rounded-full bg-background ring-0 transition-transform group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:translate-x-[calc(100%-2px)] group-data-[size=sm]/switch:data-checked:translate-x-[calc(100%-2px)] dark:data-checked:bg-primary-foreground group-data-[size=default]/switch:data-unchecked:translate-x-0 group-data-[size=sm]/switch:data-unchecked:translate-x-0 dark:data-unchecked:bg-foreground"
+        className="pointer-events-none absolute top-1/2 block -translate-y-1/2 rounded-full bg-background ring-0 transition-[inset-inline-start] duration-150 start-0 group-data-[size=default]/switch:size-4 group-data-[size=sm]/switch:size-3 group-data-[size=default]/switch:data-checked:start-[14px] group-data-[size=sm]/switch:data-checked:start-[10px] dark:data-checked:bg-primary-foreground dark:data-unchecked:bg-foreground"
       />
     </SwitchPrimitive.Root>
   )

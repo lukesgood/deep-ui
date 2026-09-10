@@ -122,3 +122,17 @@ test("an error message is shown in whatever direction the server wrote it", asyn
   render(<ErrorBox msg="فشل الاتصال" />)
   expect(screen.getByText("فشل الاتصال").getAttribute("dir")).toBe("auto")
 })
+
+test("the switch thumb is positioned logically, so it travels the right way in RTL", async () => {
+  const { Switch } = await import("@/components/ui/switch")
+  render(<Switch defaultChecked aria-label="Nightly compaction" />)
+  const thumb = document.querySelector('[data-slot="switch-thumb"]')!
+
+  // happy-dom does not lay out, so the assertion is on the mechanism rather than the
+  // pixels: the offset must be an inset-inline property, which the browser resolves
+  // against the writing direction, and never a translate, which does not flip and
+  // sent the thumb off the end of its track.
+  const classes = thumb.className
+  expect(classes).toMatch(/(^|[\s:])start-/)
+  expect(classes).not.toMatch(/translate-x/)
+})
