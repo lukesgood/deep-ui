@@ -3,6 +3,7 @@
 import * as React from "react"
 import { FileText } from "lucide-react"
 
+import { useString } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** The other half of the `[1]` markers the Markdown renderer emits.
@@ -19,19 +20,20 @@ import { cn } from "@/lib/utils"
  */
 function Citations({
   className,
-  label = "Sources",
+  label,
   children,
   ...props
 }: React.ComponentProps<"section"> & { label?: string }) {
+  const heading = useString("citations.label", label)
   return (
     <section
       data-slot="citations"
-      aria-label={label}
+      aria-label={heading}
       className={cn("space-y-1.5", className)}
       {...props}
     >
       <h3 className="text-2xs font-medium tracking-widest text-muted-foreground uppercase">
-        {label}
+        {heading}
       </h3>
       <ol className="space-y-1">{children}</ol>
     </section>

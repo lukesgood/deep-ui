@@ -10,7 +10,21 @@ your own copy, not just what moved in this repo.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **`src/lib/strings.tsx`** — every word the components say on their own, in one
+  dictionary instead of baked into twelve component files. `<StringsProvider>` is
+  optional and partial: a component takes its prop, then the provider, then English,
+  so an unfinished translation leaves the rest readable rather than blank.
+  **In your copy:** re-copy the twelve files listed below along with
+  `lib/strings.tsx`. Nothing changes visually or behaviourally if you never render the
+  provider.
+  Affected: `breadcrumb`, `citations`, `combobox`, `composer`, `conversation`,
+  `dialog`, `number-field`, `pagination`, `password-input`, `sheet`, `sidebar`, plus
+  `lib/toast.tsx` and `lib/confirm.tsx`.
+- `check:tokens` gained a rule that fails on a literal `aria-label`, `title` or
+  `placeholder` in `src/`, so the next component cannot reintroduce one. `templates/`
+  is exempt: its words are example copy.
 
 ## [0.1.0] — 2026-09-10
 

@@ -4,6 +4,7 @@ import * as React from "react"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 
 import { Input } from "@/components/ui/input"
+import { useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** A password box with a reveal toggle.
@@ -29,6 +30,7 @@ function PasswordInput({
   id,
   ...props
 }: Omit<React.ComponentProps<"input">, "type">) {
+  const strings = useStrings()
   const [revealed, setRevealed] = React.useState(false)
   const generated = React.useId()
   const inputId = id ?? generated
@@ -46,7 +48,7 @@ function PasswordInput({
         type="button"
         data-slot="password-input-toggle"
         onClick={() => setRevealed((r) => !r)}
-        aria-label={revealed ? "Hide password" : "Show password"}
+        aria-label={revealed ? strings["passwordInput.hide"] : strings["passwordInput.show"]}
         aria-pressed={revealed}
         aria-controls={inputId}
         className="absolute inset-y-0 right-0 flex w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"

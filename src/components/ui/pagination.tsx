@@ -4,6 +4,7 @@ import * as React from "react"
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
+import { useString, useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** Page navigation. The only primitive here with no Base UI counterpart, because
@@ -18,12 +19,16 @@ import { cn } from "@/lib/utils"
  *
  *  Render the items as links where the pages have URLs — a paginated list that cannot
  *  be linked to or opened in a new tab is a worse list. */
-function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
+function Pagination({
+  className,
+  label,
+  ...props
+}: React.ComponentProps<"nav"> & { label?: string }) {
   return (
     <nav
       data-slot="pagination"
       role="navigation"
-      aria-label="Pagination"
+      aria-label={useString("pagination.label", label)}
       className={cn("mx-auto flex w-full justify-center", className)}
       {...props}
     />
@@ -69,28 +74,30 @@ function PaginationLink({
 }
 
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+  const strings = useStrings()
   return (
     <PaginationLink
-      aria-label="Go to the previous page"
+      aria-label={strings["pagination.previousLabel"]}
       size="sm"
       className={cn("gap-1 px-2", className)}
       {...props}
     >
       <ChevronLeftIcon className="size-4" />
-      <span className="hidden sm:inline">Previous</span>
+      <span className="hidden sm:inline">{strings["pagination.previous"]}</span>
     </PaginationLink>
   )
 }
 
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+  const strings = useStrings()
   return (
     <PaginationLink
-      aria-label="Go to the next page"
+      aria-label={strings["pagination.nextLabel"]}
       size="sm"
       className={cn("gap-1 px-2", className)}
       {...props}
     >
-      <span className="hidden sm:inline">Next</span>
+      <span className="hidden sm:inline">{strings["pagination.next"]}</span>
       <ChevronRightIcon className="size-4" />
     </PaginationLink>
   )

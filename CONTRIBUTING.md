@@ -76,6 +76,19 @@ to `@theme` rather than reaching for `text-[13px]`. The one exception the linter
 `em`-relative sizing — `text-[0.9em]` on inline code is measured against its parent, which
 no fixed step can express.
 
+### Words the component says are not the component's to hardcode
+
+If a component needs to say something on its own — a label on an icon button, an
+`aria-label`, a default title — add a key to `src/lib/strings.tsx` and read it with
+`useString()`. Take an override prop too where a one-off caller would want one.
+
+`aria-label` is the case that matters. A visible English label in a Korean app is
+noticed immediately; an English `aria-label` is noticed only by the person using a
+screen reader, who has no way to report a bug nobody else can see.
+
+`check:tokens` fails on a literal `aria-label`, `title` or `placeholder` in `src/`.
+`templates/` is exempt — a template's words are example copy, meant to be rewritten.
+
 ### Any colour change must survive the checker
 
 ```bash

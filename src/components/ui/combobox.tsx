@@ -3,6 +3,7 @@
 import { Combobox as ComboboxPrimitive } from "@base-ui/react/combobox"
 import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
 
+import { useString } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** A Select you can type into. Reach for it once a list is long enough that scanning
@@ -31,7 +32,7 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
       />
       <ComboboxPrimitive.Trigger
         data-slot="combobox-trigger"
-        aria-label="Show options"
+        aria-label={useString("combobox.showOptions")}
         className="flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground transition-colors outline-none hover:text-foreground"
       >
         <ChevronsUpDownIcon className="size-3.5" />

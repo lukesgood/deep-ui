@@ -5,6 +5,7 @@ import { ArrowDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { useStickToBottom } from "@/hooks/use-stick-to-bottom"
+import { useString, useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 /** The container an assistant panel was missing.
@@ -36,9 +37,10 @@ import { cn } from "@/lib/utils"
 function Conversation({
   className,
   children,
-  label = "Conversation",
+  label,
   ...props
 }: React.ComponentProps<"div"> & { label?: string }) {
+  const strings = useStrings()
   const { ref, pinned, scrollToBottom } = useStickToBottom<HTMLDivElement>()
 
   return (
@@ -48,7 +50,7 @@ function Conversation({
         data-slot="conversation-log"
         role="log"
         aria-live="polite"
-        aria-label={label}
+        aria-label={label ?? strings["conversation.label"]}
         aria-relevant="additions"
         tabIndex={0}
         className="flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -61,7 +63,7 @@ function Conversation({
           size="icon-sm"
           variant="outline"
           onClick={() => scrollToBottom()}
-          aria-label="Jump to the latest message"
+          aria-label={strings["conversation.jumpToLatest"]}
           className="dp-elevated absolute inset-x-0 bottom-3 mx-auto w-fit rounded-full"
         >
           <ArrowDown />
@@ -123,9 +125,10 @@ function ConversationActions({ className, ...props }: React.ComponentProps<"div"
  *  what gets announced, and it is what a reader who has turned motion off sees. */
 function ConversationPending({
   className,
-  label = "Thinking…",
+  label,
   ...props
 }: React.ComponentProps<"div"> & { label?: string }) {
+  const text = useString("conversation.pending", label)
   return (
     <div
       data-slot="conversation-pending"
@@ -142,7 +145,7 @@ function ConversationPending({
           />
         ))}
       </span>
-      {label}
+      {text}
     </div>
   )
 }

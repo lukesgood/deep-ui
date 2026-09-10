@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from "react"
+import { useStrings } from "@/lib/strings"
 import { X, CheckCircle, AlertCircle, Info } from "lucide-react"
 
 type ToastType = "success" | "error" | "info"
@@ -30,6 +31,7 @@ const TONE: Record<ToastType, { icon: typeof Info; color: string }> = {
 }
 
 export function ToastProvider({ children }: { children: ReactNode }) {
+  const strings = useStrings()
   const [toasts, setToasts] = useState<Toast[]>([])
   const nextId = useRef(0)
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>())
@@ -64,7 +66,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div
         role="region"
-        aria-label="Notifications"
+        aria-label={strings["toast.region"]}
         className="fixed bottom-4 right-4 z-[var(--dp-z-toast)] flex flex-col gap-2"
       >
         {toasts.map((t) => {
@@ -84,7 +86,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <button
                 type="button"
                 onClick={() => dismiss(t.id)}
-                aria-label="Dismiss notification"
+                aria-label={strings["toast.dismiss"]}
                 className="shrink-0 rounded-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
               >
                 <X className="h-4 w-4" aria-hidden="true" />

@@ -280,6 +280,39 @@ composed. What the set does provide is the two controls people get wrong:
 Everything else a sign-in screen needs is already here: `Field` for the label/error
 wiring, `Input`, `Button`, `Checkbox` for "remember me", `Card` for the shell.
 
+### Translating what the components say
+
+Every word a component says on its own — `"Dismiss notification"`, `"Toggle Sidebar"`,
+`"Go to the previous page"` — comes from `lib/strings.tsx` rather than the component
+file. Most of them are `aria-label`s, which is the reason it matters: an untranslated
+visible label is obvious the first time anyone looks at the screen, and an untranslated
+`aria-label` is invisible to everyone except the person relying on it.
+
+```tsx
+import { StringsProvider } from "@/lib/strings"
+
+const ko = {
+  "toast.dismiss": "알림 닫기",
+  "sidebar.toggle": "사이드바 열고 닫기",
+  "pagination.previous": "이전",
+}
+
+<StringsProvider strings={ko}>{children}</StringsProvider>
+```
+
+Nothing is required, and nothing is all-or-nothing. A component takes its own prop if
+you passed one, the provider's value if there is one, and English otherwise — so a
+partial dictionary leaves the rest in English rather than blanking it, and an app that
+never renders the provider behaves exactly as it did before this existed.
+
+Keys are flat (`"toast.dismiss"`, not `{ toast: { dismiss } }`) so overriding one string
+is `{ ...defaults, ...yours }` rather than a deep merge, which is a thing to get wrong.
+`npm run check:tokens` fails on a new literal `aria-label` in `src/`, so the next
+component cannot quietly reintroduce one.
+
+`templates/` is exempt: a template is example code, and its words are meant to be
+rewritten rather than translated.
+
 ### Assistant panels
 
 `markdown.tsx` was always half of an assistant panel — it renders the subset a model
@@ -516,8 +549,8 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 137 tests — every component mounts, plus the behaviour above
-npm run check:tokens    # no literal colours, no raw z-index, no markup from content
+npm test                # 143 tests — every component mounts, plus the behaviour above
+npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't

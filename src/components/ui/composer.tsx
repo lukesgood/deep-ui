@@ -4,6 +4,7 @@ import * as React from "react"
 import { ArrowUp, Square } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { useStrings } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 
 type ComposerContext = {
@@ -119,12 +120,13 @@ function ComposerSubmit({
   ...props
 }: React.ComponentProps<typeof Button> & { onStop?: () => void }) {
   const { busy } = useComposer()
+  const strings = useStrings()
   return (
     <Button
       data-slot="composer-submit"
       type={busy ? "button" : "submit"}
       size="icon-sm"
-      aria-label={busy ? "Stop generating" : "Send message"}
+      aria-label={busy ? strings["composer.stop"] : strings["composer.send"]}
       onClick={busy ? onStop : undefined}
       className={cn("rounded-full", className)}
       {...props}

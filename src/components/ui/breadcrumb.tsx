@@ -2,13 +2,19 @@ import * as React from "react"
 import { mergeProps } from "@base-ui/react/merge-props"
 import { useRender } from "@base-ui/react/use-render"
 
+import { useString } from "@/lib/strings"
 import { cn } from "@/lib/utils"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
-function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
+function Breadcrumb({
+  className,
+  label,
+  ...props
+}: React.ComponentProps<"nav"> & { label?: string }) {
+  const name = useString("breadcrumb.label", label)
   return (
     <nav
-      aria-label="breadcrumb"
+      aria-label={name}
       data-slot="breadcrumb"
       className={cn(className)}
       {...props}
@@ -109,7 +115,7 @@ function BreadcrumbEllipsis({
     >
       <MoreHorizontalIcon
       />
-      <span className="sr-only">More</span>
+      <span className="sr-only">{useString("breadcrumb.more")}</span>
     </span>
   )
 }

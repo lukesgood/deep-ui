@@ -7,6 +7,7 @@
 import { createContext, useContext, useRef, useState, useCallback, ReactNode } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { useStrings } from "@/lib/strings"
 import { AlertTriangle } from "lucide-react"
 
 type ConfirmOpts = {
@@ -21,6 +22,7 @@ type ConfirmFn = (opts: ConfirmOpts) => Promise<boolean>
 const ConfirmContext = createContext<ConfirmFn | undefined>(undefined)
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
+  const strings = useStrings()
   const [open, setOpen] = useState(false)
   const [opts, setOpts] = useState<ConfirmOpts>({})
   const resolver = useRef<((v: boolean) => void) | null>(null)
@@ -45,7 +47,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
               {opts.destructive && <AlertTriangle className="h-4 w-4 text-destructive" />}
-              {opts.title || "Confirm"}
+              {opts.title || strings["confirm.title"]}
             </DialogTitle>
           </DialogHeader>
           {opts.message && (
@@ -53,10 +55,10 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           )}
           <DialogFooter>
             <Button variant="outline" size="sm" onClick={() => done(false)}>
-              {opts.cancelText || "Cancel"}
+              {opts.cancelText || strings["confirm.cancel"]}
             </Button>
             <Button size="sm" variant={opts.destructive ? "destructive" : "default"} onClick={() => done(true)}>
-              {opts.confirmText || "Confirm"}
+              {opts.confirmText || strings["confirm.confirm"]}
             </Button>
           </DialogFooter>
         </DialogContent>

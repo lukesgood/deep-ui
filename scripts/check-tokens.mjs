@@ -52,6 +52,20 @@ const RULES = [
     },
   },
   {
+    id: "baked-in-string",
+    why: "a word the component says itself has to be overridable — see src/lib/strings.tsx",
+    // aria-label carries most of them, which is what makes this worth a rule: an
+    // untranslated visible label is obvious, an untranslated aria-label is invisible
+    // to everyone except the person relying on it.
+    pattern: /(?:aria-label|title|placeholder)="[A-Za-z][^"]*"|sr-only">[A-Z][a-z]/g,
+    allowed: {
+      "templates/sign-in.tsx": "a template is example code — its words are meant to be rewritten, not translated",
+      "templates/profile.tsx": "same",
+      "templates/settings.tsx": "same",
+      "templates/assistant-shell.tsx": "same",
+    },
+  },
+  {
     id: "raw-html",
     why: "SECURITY.md promises no path from content to markup; this is that promise, enforced",
     pattern: /dangerouslySetInnerHTML|\.innerHTML\s*=/g,
