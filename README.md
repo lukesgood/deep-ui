@@ -336,13 +336,22 @@ what you see in the gallery is what you get from the file.
 
 | | |
 |---|---|
-| [`sign-in`](templates/sign-in.tsx) | Email, password and a second factor, as two steps rather than two screens |
+| [`sign-in`](templates/sign-in.tsx) | Passkey, password and a sign-in link, with a second factor — one card, five steps |
 | [`settings`](templates/settings.tsx) | Tabs, grouped fields, and a save bar that appears only once something changed |
 | [`assistant-shell`](templates/assistant-shell.tsx) | An app shell with the assistant docked on the right |
 
 Each is a starting point, not a component — copy it and change everything. What is worth
 keeping is the wiring, which is invisible when right and expensive when wrong. Two things
 they demonstrate that are easy to get backwards:
+
+**Passkeys need one thing from the markup.** `autoComplete="username webauthn"` on the
+email field is what lets the browser offer a saved passkey from the field itself; without
+that token, a `mediation: "conditional"` request shows nothing at all. The button beside
+it covers the usernameless case.
+
+**A step change has to move focus.** `sign-in` swaps one card between five states. Doing
+that without moving focus leaves a keyboard or screen-reader user standing on a button
+that no longer exists, hearing nothing — so each step takes focus on its own heading.
 
 **Let the browser validate, and supply only the wording.** `type="email" required` already
 knows what a malformed address is. A custom `validate` alongside it looks like it works

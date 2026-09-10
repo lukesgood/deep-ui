@@ -57,16 +57,33 @@ test("the assistant is dismissable, and says which state its control will produc
 
 /* ── sign-in ──────────────────────────────────────────────────────────────── */
 
-test("sign-in refuses to advance until both fields are valid, and says why", async () => {
+test("the three methods are offered in the order they deserve", () => {
   setViewport(false)
   render(<SignIn />)
+  const labels = screen
+    .getAllByRole("button")
+    .map((b) => b.textContent?.trim())
+    .filter(Boolean)
+  // Passkey first: fastest, and the only one of the three that cannot be phished.
+  expect(labels[0]).toBe("Continue with a passkey")
+  expect(labels).toContain("Continue with a password")
+  expect(labels).toContain("Email me a sign-in link")
+})
 
-  fireEvent.click(screen.getByRole("button", { name: "Continue" }))
+test("the email field opts into passkey conditional UI", () => {
+  // `webauthn` in the autocomplete token list is what lets the browser offer a saved
+  // passkey from the field itself. Without it, conditional mediation shows nothing.
+  setViewport(false)
+  render(<SignIn />)
+  expect(screen.getByLabelText("Email").getAttribute("autocomplete")).toBe("username webauthn")
+})
 
+test("the password route refuses to advance on an empty address, and says why", async () => {
+  setViewport(false)
+  render(<SignIn />)
+  fireEvent.click(screen.getByRole("button", { name: "Continue with a password" }))
   expect(await screen.findByText("Enter your email address.")).toBeTruthy()
-  expect(screen.getByText("Enter your password.")).toBeTruthy()
-  // Still on step one.
-  expect(screen.queryByText("Verification code")).toBeNull()
+  expect(screen.queryByLabelText("Password")).toBeNull()
 })
 
 test("a malformed address is caught on blur, in our words rather than the browser's", async () => {
@@ -95,14 +112,45 @@ test("tabbing past an untouched empty field does not scold you; submitting does"
   await new Promise((r) => setTimeout(r, 100))
   expect(screen.queryByText("Enter your email address.")).toBeNull()
 
-  fireEvent.click(screen.getByRole("button", { name: "Continue" }))
+  fireEvent.click(screen.getByRole("button", { name: "Continue with a password" }))
   expect(await screen.findByText("Enter your email address.")).toBeTruthy()
 })
 
-test("the password box asks the manager for the current password, not a new one", () => {
+test("the password step asks the manager for the current password, not a new one", async () => {
   setViewport(false)
   render(<SignIn />)
-  const password = document.querySelector<HTMLInputElement>('[data-slot="password-input"] input')!
-  expect(password.autocomplete).toBe("current-password")
-  expect(screen.getByLabelText("Email").getAttribute("autocomplete")).toBe("username")
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "luke@example.com" } })
+  fireEvent.click(screen.getByRole("button", { name: "Continue with a password" }))
+
+  const password = await screen.findByLabelText("Password")
+  expect((password as HTMLInputElement).autocomplete).toBe("current-password")
+})
+
+test("the sign-in link step names the address it went to, and gates the resend", async () => {
+  setViewport(false)
+  render(<SignIn />)
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "luke@example.com" } })
+  fireEvent.click(screen.getByRole("button", { name: "Email me a sign-in link" }))
+
+  // The one method whose next step happens somewhere else, so the address has to be
+  // on screen — a typo is otherwise a silent dead end.
+  expect(await screen.findByText(/luke@example\.com/)).toBeTruthy()
+  expect(screen.getByRole("heading", { name: "Check your inbox" })).toBeTruthy()
+  expect(screen.getByRole("button", { name: /Resend in/ }).hasAttribute("disabled")).toBe(true)
+})
+
+test("a step change moves focus, instead of leaving it on a button that is gone", async () => {
+  setViewport(false)
+  render(<SignIn />)
+  fireEvent.click(screen.getByRole("button", { name: "Email me a sign-in link" }))
+  const heading = await screen.findByRole("heading", { name: "Check your inbox" })
+  expect(document.activeElement).toBe(heading)
+})
+
+test("the passkey step says what is happening and offers a way out", () => {
+  setViewport(false)
+  render(<SignIn />)
+  fireEvent.click(screen.getByRole("button", { name: "Continue with a passkey" }))
+  expect(screen.getByRole("status").textContent).toContain("Waiting for your passkey")
+  expect(screen.getByRole("button", { name: "Use another method" })).toBeTruthy()
 })

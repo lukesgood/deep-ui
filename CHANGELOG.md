@@ -14,6 +14,11 @@ Nothing has been tagged or released yet; everything below is on `main`.
 
 ### Added
 
+- **`sign-in` gained passkey and sign-in-link routes**, and was rebuilt to look like
+  the rest of the system: the gradient runs under the card as a wash rather than
+  appearing only on a 40px logo tile, the heading uses `.dp-gradient-text`, and the card
+  sits on `.dp-elevated`. Five steps in one card, each of which moves focus to its own
+  heading.
 - **`templates/`** — three whole screens, copy-in like `src/`: `sign-in`,
   `settings`, `assistant-shell`. The gallery serves them at `#/t/<id>`.
   **In your copy:** additive, and optional — nothing in `src/` depends on them.
