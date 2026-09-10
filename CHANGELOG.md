@@ -53,6 +53,16 @@ your own copy, not just what moved in this repo.
 
 ### Added
 
+- **ESLint** (`npm run lint`), for the two things the scripts in `scripts/` cannot see:
+  `jsx-a11y` for accessibility mistakes visible in the source, and `react-hooks` for
+  stale closures. No style rules and no formatter. It found one thing on the first run:
+  `templates/sign-in.tsx` had `autoFocus` on the password field, contradicting the
+  template's own documented rule that every step takes focus on its heading. It was
+  dead rather than harmful — the heading effect wins the race, and a test now says so
+  for that step too — but it was one ordering change away from silently skipping the
+  step announcement.
+  **In your copy:** re-copy `templates/sign-in.tsx` if you took it.
+
 - **`test/keyboard.test.tsx`** — twelve tests covering the half of the accessibility
   audit list that does not need a person. Tab stays inside an open dialog; Dialog,
   AlertDialog and Sheet all return focus to the trigger; a combobox moves

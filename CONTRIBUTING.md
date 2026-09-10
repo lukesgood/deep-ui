@@ -89,6 +89,29 @@ screen reader, who has no way to report a bug nobody else can see.
 `check:tokens` fails on a literal `aria-label`, `title` or `placeholder` in `src/`.
 `templates/` is exempt — a template's words are example copy, meant to be rewritten.
 
+### The linter covers what the scripts cannot
+
+```bash
+npm run lint
+```
+
+Two plugins and no style rules. There is no formatter here and no opinion about quotes
+or semicolons — a contributor should be arguing about behaviour, not about commas.
+
+- **`jsx-a11y`** — accessibility mistakes visible in the source. A design system that
+  measures its own contrast and then ships a `<div onClick>` is being careful in one
+  place. Warnings fail the build (`--max-warnings 0`) so they cannot pile up.
+- **`react-hooks`** — a stale closure is invisible in review and invisible to `tsc`,
+  and shows up months later as "sometimes it scrolls to the wrong place".
+
+Two `jsx-a11y` rules are off in `eslint.config.mjs`, with the reason written there:
+`anchor-has-content` and `heading-has-content` cannot see children arriving through
+`{...props}` in a wrapper or through Base UI's `render` prop, which are the two idioms
+this codebase is built out of, so they only ever fire falsely here. Everything else is
+on. If you need a disable comment, put the reason next to it — `conversation.tsx` has
+the one example: a scrollable region has to be focusable or a keyboard user cannot
+scroll it at all, which is not something the rule can see.
+
 ### Any colour change must survive the checker
 
 ```bash

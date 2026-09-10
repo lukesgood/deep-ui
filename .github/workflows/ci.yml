@@ -36,6 +36,9 @@ jobs:
       - name: Typecheck the demo
         run: npm run typecheck -w deep-ui-demo
 
+      - name: Lint
+        run: npm run lint
+
       - name: Tests
         run: npm test
 

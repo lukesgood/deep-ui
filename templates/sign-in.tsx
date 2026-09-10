@@ -260,7 +260,7 @@ function Password({ onBack, onDone }: { onBack: () => void; onDone: () => void }
     >
       <Field name="password" validationMode="onBlur">
         <FieldLabel>Password</FieldLabel>
-        <FieldControl render={<PasswordInput required autoComplete="current-password" autoFocus />} />
+        <FieldControl render={<PasswordInput required autoComplete="current-password" />} />
         <FieldError match="valueMissing">Enter your password.</FieldError>
       </Field>
       <div className="flex items-center justify-between">

@@ -147,6 +147,20 @@ test("a step change moves focus, instead of leaving it on a button that is gone"
   expect(document.activeElement).toBe(heading)
 })
 
+test("the password step lands on its heading, not on the password box", async () => {
+  setViewport(false)
+  render(<SignIn />)
+  fireEvent.change(screen.getByLabelText("Email"), { target: { value: "sujin@example.com" } })
+  fireEvent.click(screen.getByRole("button", { name: "Continue with a password" }))
+
+  // Every step is supposed to take focus on its heading, so the person is told which
+  // step they are on before being dropped into a field. A field that grabs focus on
+  // mount skips the announcement — you are typing into something you were never told
+  // the name of.
+  const heading = await screen.findByRole("heading")
+  expect(document.activeElement).toBe(heading)
+})
+
 test("the passkey step says what is happening and offers a way out", () => {
   setViewport(false)
   render(<SignIn />)

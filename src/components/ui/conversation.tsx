@@ -52,6 +52,11 @@ function Conversation({
         aria-live="polite"
         aria-label={label ?? strings["conversation.label"]}
         aria-relevant="additions"
+        // A scrollable region that cannot take focus cannot be scrolled from the
+        // keyboard at all (WCAG 2.1.1), which is why this is here despite the rule.
+        // The role is `log`, which jsx-a11y counts as non-interactive; scrollability
+        // is not something it can see.
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         className="flex-1 space-y-4 overflow-y-auto overscroll-contain p-3 outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
         {...props}
