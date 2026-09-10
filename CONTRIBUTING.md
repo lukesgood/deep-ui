@@ -95,12 +95,26 @@ screen reader, who has no way to report a bug nobody else can see.
 npm run check:tokens                  # literal colours, raw z-index, one-off type sizes
 npm run check:contrast                # summary
 npm run check:contrast -- --verbose   # every pair, with its ratio
+npm run check:selectors               # rules in tokens.css that point at nothing
 ```
 
-It reads the real values out of `src/styles/tokens.css` and measures 232 pairs across
-both themes — every text token against all four surfaces and against its own 10%
+It reads the real values out of `src/styles/tokens.css` and measures 464 pairs across
+four palettes — every text token against all four surfaces and against its own 10%
 tint, every foreground on the fill it sits on, and the solid status step, chart ramp
 and focus ring at 3:1.
+
+Four palettes, not two, because `@media (prefers-contrast: more)` is a palette. It is
+merged onto the theme it overrides exactly the way the browser computes it, then
+measured whole. Conditional palettes are the ones nobody looks at, so they are the
+ones most worth checking. `@media print` is excluded from this deliberately: it is a
+paper palette, and measuring it against screen rules would only produce noise.
+
+`check:selectors` is the other half of the same problem. A rule that names a
+`data-slot` no component emits never matches and never complains — that is how the
+print block here shipped hiding a `[data-slot="toast"]` that did not exist. It checks
+both directions: selectors with no markup, and `.dp-*` classes nothing uses. A class
+meant for adopters rather than for us goes in the script's `OFFERED` list, with a
+reason.
 
 Two things it will not let you do quietly: it fails on any token it cannot parse
 rather than skipping it, and the handful of genuinely excluded tokens are listed in

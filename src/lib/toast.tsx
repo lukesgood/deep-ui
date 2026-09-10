@@ -66,6 +66,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ toast }}>
       {children}
       <div
+        data-slot="toast-viewport"
         role="region"
         aria-label={strings["toast.region"]}
         className="fixed bottom-4 right-4 z-[var(--dp-z-toast)] flex flex-col gap-2"
@@ -74,6 +75,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           const { icon: Icon, color } = TONE[t.type]
           return (
             <div
+              data-slot="toast"
               key={t.id}
               // An error interrupts; the other two wait for a pause in speech. The roles
               // carry the live-region semantics, so the container must not also be one —

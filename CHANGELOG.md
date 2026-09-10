@@ -37,6 +37,12 @@ your own copy, not just what moved in this repo.
 
 ### Changed
 
+- **`check:contrast` measures four palettes, not two** — light, dark, and each one again
+  as the browser computes it under `prefers-contrast: more`. 232 pairs became 464. It
+  had also been merging every `:root` block it found regardless of the at-rule around
+  it, so the print block's `.dark { --background: #ffffff }` folded into the dark theme
+  and measured the whole dark palette against paper; block boundaries are brace-counted
+  now rather than "the next `}` at the start of a line".
 - `leading-none` on labels and titles became `leading-tight`. A line-height of exactly
   1 leaves no room for the marks Thai, Vietnamese and Devanagari put above and below
   the line, and clips them.
@@ -46,6 +52,29 @@ your own copy, not just what moved in this repo.
   `max-w-(--available-width)` so it fits a narrow viewport.
 
 ### Added
+
+- **`@media (prefers-contrast: more)`** in `tokens.css`. Three tokens move and the rest
+  stay: `--muted-foreground` to AAA (7:1), `--border` to the 3:1 that identifies a
+  control, `--input` past it. Hue and saturation are unchanged; only lightness. Raising
+  everything would flatten the difference between a heading and a hint, which is itself
+  information.
+  **In your copy:** re-copy `styles/tokens.css`. Nothing changes unless the reader has
+  asked their OS for more contrast.
+- **`@media print`** in `tokens.css`. A data app gets printed, and left alone it prints
+  badly: the sidebar becomes a grey column down the page, a sideways-scrolling table
+  prints only the columns that were in view, and the light theme spends toner on a
+  near-white background. Now the palette flips to black on white in both themes,
+  overlays and chrome are excluded, scrolling containers print whole, shadows drop, and
+  rows, cards and headings do not break across a page.
+  **In your copy:** re-copy `styles/tokens.css` and `lib/toast.tsx` (the toast viewport
+  and each toast gained a `data-slot`, which is what the print block hides them by). If
+  your app has its own chrome to keep off the page, add it to the exclusion list.
+- **`scripts/check-selectors.mjs`** (`npm run check:selectors`) — a rule naming a
+  `data-slot` no component emits never matches and never errors. That is how the print
+  block above first shipped hiding a `[data-slot="toast"]` that did not exist: the only
+  symptom would have been a bad printout, months later, on somebody else's paper. The
+  check runs both directions — selectors with no markup, and `.dp-*` classes nothing
+  uses.
 
 - **`src/lib/strings.tsx`** — every word the components say on their own, in one
   dictionary instead of baked into twelve component files. `<StringsProvider>` is

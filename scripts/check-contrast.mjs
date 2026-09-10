@@ -76,7 +76,15 @@ const hex = (c) =>
 function readBlock(css, selector) {
   const blocks = []
   for (let i = css.indexOf(`${selector} {`); i !== -1; i = css.indexOf(`${selector} {`, i + 1)) {
-    const end = css.indexOf("\n}", i)
+    // Brace-counted, not "the next `}` at column 0": inside an `@media` the block's
+    // own closing brace is indented, and stopping at the outer one would swallow
+    // every sibling rule after it — silently measuring the wrong palette.
+    let depth = 0
+    let end = -1
+    for (let j = css.indexOf("{", i); j < css.length; j++) {
+      if (css[j] === "{") depth++
+      else if (css[j] === "}" && --depth === 0) { end = j; break }
+    }
     if (end === -1) throw new Error(`unterminated ${selector} block in tokens.css`)
     blocks.push(css.slice(i, end))
   }
@@ -136,10 +144,54 @@ const EXCLUDED = {
 /* ── run ──────────────────────────────────────────────────────────────────── */
 
 const css = readFileSync(TOKENS, "utf8")
+
+/** The stylesheet region for one at-rule, or "" when it is not there.
+ *  Brace-counted rather than regex-matched, because these blocks nest. */
+function atRule(source, prelude) {
+  const start = source.indexOf(prelude)
+  if (start === -1) return ""
+  let depth = 0
+  for (let i = source.indexOf("{", start); i < source.length; i++) {
+    if (source[i] === "{") depth++
+    else if (source[i] === "}" && --depth === 0) return source.slice(start, i + 1)
+  }
+  throw new Error(`unterminated ${prelude} in tokens.css`)
+}
+
+/** Every `@media` region removed, so the base palette is read on its own.
+ *
+ *  Without this the print block's `.dark { --background: #ffffff }` merges into the
+ *  dark theme and the whole dark palette measures against paper. Conditional
+ *  palettes are real palettes and get measured — but as themes of their own, below,
+ *  not folded into the one they override. */
+function stripMedia(source) {
+  let out = source
+  for (let i = out.indexOf("@media"); i !== -1; i = out.indexOf("@media")) {
+    const region = atRule(out.slice(i), "@media")
+    out = out.slice(0, i) + out.slice(i + region.length)
+  }
+  return out
+}
+
+const base = stripMedia(css)
+const light = readBlock(base, ":root")
+const dark = readBlock(base, ".dark")
+
+/** A conditional palette inherits everything it does not restate, so it is measured
+ *  as the base with the overrides applied — the same thing the browser computes. */
+function variant(region, ground) {
+  if (!region) return null
+  const overrides = readBlock(region, ground === light ? ":root" : ".dark")
+  return { ...ground, ...overrides }
+}
+
+const moreContrast = atRule(css, "@media (prefers-contrast: more)")
 const themes = [
-  ["light", readBlock(css, ":root")],
-  ["dark", readBlock(css, ".dark")],
-]
+  ["light", light],
+  ["dark", dark],
+  ["light, prefers-contrast: more", variant(moreContrast, light)],
+  ["dark, prefers-contrast: more", variant(moreContrast, dark)],
+].filter(([, T]) => T)
 
 let checks = 0
 const failures = []

@@ -247,6 +247,41 @@ transition utilities, `tw-animate-css`'s enter/exit animations, and the `shake` 
 @media (prefers-reduced-motion: reduce) { /* in tokens.css */ }
 ```
 
+### More contrast, and paper
+
+Two more environments the reader can be in, both of which the tokens answer.
+
+**`prefers-contrast: more`** is somebody telling their OS they want more separation. It
+costs nothing to honour, so it is honoured — but only where it buys something. Three
+tokens move and the rest stay: `--muted-foreground` goes to AAA (7:1), `--border` to the
+3:1 that identifies a control, `--input` past it. Hue and saturation do not change; only
+lightness. Raising *everything* would flatten the difference between a heading and a hint,
+and that difference is information too.
+
+These are measured, not asserted — `check:contrast` merges the override onto each theme
+the way the browser does and runs the full suite again, which is why the pair count is 464
+and not 232.
+
+**Print.** A data app gets printed: somebody wants the table on paper, or a PDF of it for
+somebody who will not log in. Left alone, the sidebar prints as a grey column down the
+page, a table that scrolls sideways prints only the columns that happened to be in view,
+and the light theme spends toner on a near-white background. So:
+
+- the palette flips to black on white, in both themes
+- sidebar, toasts and every overlay are `display: none` — a dialog on paper is a
+  screenshot of a moment, not a document
+- scrolling containers (`table-container`, the scroll-area viewport, the conversation log)
+  print whole
+- shadows drop, and rows, cards and headings do not break across a page
+
+Both blocks live in `tokens.css`, so a copied tree gets them without doing anything. If
+your app has its own chrome to leave off the page, add it to the print block's exclusion
+list.
+
+`npm run check:selectors` exists because of this section. A rule that names a `data-slot`
+no component emits never matches and never errors; the only symptom is a bad printout,
+months later, on somebody else's paper. The check catches it at the point of writing.
+
 ### Fonts
 
 Set `--dp-font-sans`, `--dp-font-mono`, or `--dp-font-heading` to override; each falls back
@@ -508,7 +543,11 @@ button or an inline error actually renders:
 - text tokens clear **4.5:1** (WCAG 2.1 AA, normal text)
 - the solid status step, the chart ramp and the focus ring clear **3:1** (AA non-text)
 
-That is 232 pairs, and they all pass. Several light-theme values are darker than a stock
+Four palettes are measured, not two: light, dark, and each one again as the browser
+computes it under `prefers-contrast: more`. A conditional palette that quietly regressed
+would otherwise be the least likely thing in the system to be noticed.
+
+That is 464 pairs, and they all pass. Several light-theme values are darker than a stock
 shadcn palette for exactly this reason.
 
 This is not a claim you have to take on trust, and it is not a claim that rots:
@@ -529,8 +568,8 @@ outside what 1.4.11 asks for.
 
 **What it does not guarantee.** The components are keyboard-operable and labelled, toasts
 announce (errors as `role="alert"`, the rest as `role="status"`), and
-`prefers-reduced-motion` is honoured, but **none of this has been through a screen-reader
-audit.** Treat the components as a good starting point, not a compliance claim.
+`prefers-reduced-motion` and `prefers-contrast: more` are both honoured, but **none of
+this has been through a screen-reader audit.** Treat the components as a good starting point, not a compliance claim.
 
 ### What an audit still has to cover
 

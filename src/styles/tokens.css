@@ -260,6 +260,92 @@
   --dp-hairline: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.12), transparent);
 }
 
+/* ── More contrast, if the reader asked their OS for it ──────────────────────
+   `prefers-contrast: more` is a request, and it costs nothing to honour: only the
+   three tokens that sit lowest move, and only far enough. Body text and the accent
+   already clear AA comfortably and are left alone — raising everything would flatten
+   the difference between "this is a heading" and "this is a hint", which is itself
+   information.
+
+   --muted-foreground goes to AAA (7:1), --border to the 3:1 that identifies a
+   control, --input past it. The hue does not change; only the lightness.          */
+@media (prefers-contrast: more) {
+  :root {
+    --muted-foreground: #415158;
+    --border: #618f9c;
+    --input: #4e717a;
+    --sidebar-border: #618f9c;
+  }
+  .dark {
+    --muted-foreground: #9aaeb5;
+    --border: rgb(255 255 255 / 0.335);
+    --input: rgb(255 255 255 / 0.465);
+    --sidebar-border: rgb(255 255 255 / 0.335);
+  }
+}
+
+/* ── Print ───────────────────────────────────────────────────────────────────
+   A data app gets printed: somebody wants the table on paper, or a PDF of it for
+   somebody who will not log in. Left alone, the sidebar prints as a grey column
+   down the page, a scrolling table prints only the columns that happened to be in
+   view, and the light theme's near-white background wastes toner on every page.
+
+   Overlays are excluded rather than styled: a dialog on paper is a screenshot of a
+   moment, not a document.                                                        */
+@media print {
+  :root,
+  .dark {
+    --background: #ffffff;
+    --foreground: #000000;
+    --card: #ffffff;
+    --card-foreground: #000000;
+    --muted-foreground: #333333;
+    --border: #999999;
+    --input: #999999;
+  }
+
+  [data-slot="sidebar"],
+  [data-slot="sidebar-rail"],
+  [data-slot="sidebar-trigger"],
+  [data-slot="toast-viewport"],
+  [data-slot="dialog-content"],
+  [data-slot="dialog-overlay"],
+  [data-slot="sheet-content"],
+  [data-slot="tooltip-content"],
+  [data-slot="dropdown-menu-content"],
+  [data-slot="popover-content"] {
+    display: none !important;
+  }
+
+  /* A table that scrolls sideways on screen has to print whole. */
+  [data-slot="table-container"],
+  [data-slot="scroll-area-viewport"],
+  [data-slot="conversation-log"] {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  /* Elevation is a screen idea; on paper it is a grey smudge. */
+  .dp-surface,
+  .dp-elevated {
+    box-shadow: none !important;
+  }
+  .dp-surface::before {
+    display: none;
+  }
+
+  /* Do not break a row, a card or a heading across a page. */
+  tr,
+  li,
+  [data-slot="card"] {
+    break-inside: avoid;
+  }
+  h1, h2, h3, h4 {
+    break-after: avoid;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
