@@ -32,6 +32,16 @@ your own copy, not just what moved in this repo.
   Affected: `breadcrumb`, `citations`, `combobox`, `composer`, `conversation`,
   `dialog`, `number-field`, `pagination`, `password-input`, `sheet`, `sidebar`, plus
   `lib/toast.tsx` and `lib/confirm.tsx`.
+- **RTL layout.** Ninety-three physical properties became logical ones — `ps-`,
+  `pe-`, `ms-`, `me-`, `border-s`, `text-start` — and trailing-edge affordances moved
+  from `right-*` to `end-*`. Centring (`left-1/2` with `-translate-x-1/2`) and the
+  explicit `side="left" | "right"` props on `Sheet` and `Sidebar` stay physical on
+  purpose. New `--dp-flip` token carries the sign for transforms, which have no logical
+  equivalent.
+  **In your copy:** re-copy the component files; nothing changes in LTR.
+  *Known gap:* `Switch`'s thumb still slides rightward in RTL and overshoots its track.
+- **Dates in `templates/profile.tsx`** use `Intl.DateTimeFormat` and
+  `Intl.RelativeTimeFormat` inside `<time datetime>`, instead of English strings.
 - **Script-aware line breaking**: `word-break: keep-all` for `:lang(ko)`,
   `line-break: strict` for `:lang(ja)` and `:lang(zh)`, and CJK faces at the end of the
   font stack — `system-ui` is Segoe UI on Windows, which has no Hangul or kana.

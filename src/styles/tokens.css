@@ -22,6 +22,27 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Direction ───────────────────────────────────────────────────────────────
+   CSS has logical properties for padding, margin and borders, and none for
+   transforms: `translate-x` moves right in both directions, so anything that
+   slides — a switch thumb, a drawer — travels the wrong way in RTL.
+
+   `--dp-flip` is the sign. Multiply any inline offset by it and the thing moves
+   toward the end of the line in whichever direction the line runs:
+
+       translate-x-[calc((100%-2px)*var(--dp-flip))]
+
+   Pairing `ltr:` and `rtl:` variants does the same job, until two of them land on
+   one element and the later one in the stylesheet wins regardless of which
+   matches. This has no ordering to get wrong.                                  */
+:root {
+  --dp-flip: 1;
+}
+:root:dir(rtl),
+[dir="rtl"] {
+  --dp-flip: -1;
+}
+
 /* ── Stacking order ──────────────────────────────────────────────────────────
    Every overlay used to sit at z-50, which means the order they stacked in was
    whatever order they happened to reach the DOM. The visible symptom: raise a

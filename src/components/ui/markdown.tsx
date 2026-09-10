@@ -57,12 +57,12 @@ export function Markdown({
           )
         }
         if (b.t === "ul") return (
-          <ul key={i} dir="auto" className="list-disc space-y-0.5 pl-4">
+          <ul key={i} dir="auto" className="list-disc space-y-0.5 ps-4">
             {b.items.map((it, j) => <li key={j}><Spans spans={it} citationHref={citationHref} /></li>)}
           </ul>
         )
         if (b.t === "ol") return (
-          <ol key={i} dir="auto" className="list-decimal space-y-0.5 pl-4">
+          <ol key={i} dir="auto" className="list-decimal space-y-0.5 ps-4">
             {b.items.map((it, j) => <li key={j}><Spans spans={it} citationHref={citationHref} /></li>)}
           </ol>
         )

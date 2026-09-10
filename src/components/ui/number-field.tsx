@@ -36,7 +36,7 @@ function NumberFieldGroup({ className, ...props }: NumberFieldPrimitive.Group.Pr
       <NumberFieldPrimitive.Decrement
         data-slot="number-field-decrement"
         aria-label={strings["numberField.decrement"]}
-        className="flex size-8 shrink-0 items-center justify-center rounded-l-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none"
+        className="flex size-8 shrink-0 items-center justify-center rounded-s-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none"
       >
         <MinusIcon className="size-3.5" />
       </NumberFieldPrimitive.Decrement>
@@ -47,7 +47,7 @@ function NumberFieldGroup({ className, ...props }: NumberFieldPrimitive.Group.Pr
       <NumberFieldPrimitive.Increment
         data-slot="number-field-increment"
         aria-label={strings["numberField.increment"]}
-        className="flex size-8 shrink-0 items-center justify-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none"
+        className="flex size-8 shrink-0 items-center justify-center rounded-e-lg text-muted-foreground transition-colors outline-none hover:bg-muted hover:text-foreground disabled:pointer-events-none"
       >
         <PlusIcon className="size-3.5" />
       </NumberFieldPrimitive.Increment>

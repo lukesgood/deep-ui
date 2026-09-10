@@ -327,6 +327,12 @@ depend on your page setting `lang` — which it should anyway.
 The font stack ends in CJK faces for the same reason: `system-ui` resolves to Segoe UI
 on Windows, which has no Hangul or kana at all.
 
+**Dates are the browser's to format.** `templates/profile.tsx` uses
+`Intl.DateTimeFormat` and `Intl.RelativeTimeFormat` rather than strings: "12 Mar 2026"
+is wrong in most of the world before anyone translates a word, and "3 days ago" is not
+"3일 전" with the words swapped. Each renders inside a `<time datetime>` so the instant
+survives the formatting.
+
 **Text the components did not write carries `dir="auto"`.** `Markdown` (per block, so
 one answer can hold an English paragraph and an Arabic one), `ConversationMessage`,
 `ErrorBox`'s message, and a `Citation`'s title and location. All four render content
@@ -337,9 +343,21 @@ Labels use `leading-tight` rather than `leading-none`: a line-height of exactly 
 no room for the marks Thai, Vietnamese and Devanagari put above and below the line, and
 clips them.
 
-RTL layout itself is **not** done — the components still use physical properties
-(`pl-`, `border-l`) rather than logical ones in about a hundred places, so an
-`dir="rtl"` page will lay out left-to-right. That is a known gap, not a claim.
+**RTL lays out.** Padding, margins, borders and text alignment use logical properties
+(`ps-`, `border-s`, `text-start`), and trailing-edge affordances — a select's tick, a
+dialog's close, a sidebar's action — sit at `end-*` rather than `right-*`. What stays
+physical stays physical on purpose: `left-1/2` paired with `-translate-x-1/2` is
+centring, not direction, and `Sheet`'s and `Sidebar`'s `side="left" | "right"` mean what
+they say.
+
+For anything that *slides*, CSS has no logical transform, so `--dp-flip` carries the
+sign: `translate-x-[calc(8px*var(--dp-flip))]` moves toward the end of the line in
+whichever direction the line runs.
+
+One known gap: `Switch`'s thumb still travels rightward in both directions, so it
+overshoots its track under `dir="rtl"`. Both a `ltr:`/`rtl:` pair and `--dp-flip` were
+tried — `--tw-translate-x` computes to the negative value and the element lays out as
+though it were positive — and it was left alone rather than shipped half-fixed.
 
 ### Assistant panels
 
@@ -577,7 +595,7 @@ npm run check        # everything below, which is exactly what CI runs
 
 ```bash
 npm run typecheck       # the template and the tests
-npm test                # 146 tests — every component mounts, plus the behaviour above
+npm test                # 147 tests — every component mounts, plus the behaviour above
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:contrast  # the palette, measured against tokens.css
 npm run check:docs      # the numbers in this file, against the code they describe

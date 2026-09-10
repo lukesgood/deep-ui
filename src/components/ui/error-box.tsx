@@ -28,8 +28,8 @@ export function ErrorBox({ msg, action, hint, className = "" }: {
         {/* The message is whatever the server said, in whatever language it says it. */}
         <span dir="auto">{msg}</span>
       </div>
-      {action && <div className="pl-6 pt-1">{action}</div>}
-      {hint && <div className="pl-6">{hint}</div>}
+      {action && <div className="ps-6 pt-1">{action}</div>}
+      {hint && <div className="ps-6">{hint}</div>}
     </div>
   )
 }

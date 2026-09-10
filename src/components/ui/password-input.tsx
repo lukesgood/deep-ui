@@ -41,7 +41,7 @@ function PasswordInput({
         id={inputId}
         type={revealed ? "text" : "password"}
         autoComplete={autoComplete}
-        className={cn("pr-8", className)}
+        className={cn("pe-8", className)}
         {...props}
       />
       <button
@@ -51,7 +51,7 @@ function PasswordInput({
         aria-label={revealed ? strings["passwordInput.hide"] : strings["passwordInput.show"]}
         aria-pressed={revealed}
         aria-controls={inputId}
-        className="absolute inset-y-0 right-0 flex w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="absolute inset-y-0 end-0 flex w-8 items-center justify-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
       >
         {revealed ? (
           <EyeOffIcon className="size-4" />

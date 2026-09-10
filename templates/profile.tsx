@@ -38,26 +38,65 @@ import { useToast } from "@/lib/toast"
  *  misclick locks someone out of their own account. The confirm is not ceremony.
  */
 
-type Passkey = { id: string; name: string; added: string; lastUsed: string }
+type Passkey = { id: string; name: string; added: Date; lastUsed: Date }
 type Session = {
   id: string
   device: string
   where: string
-  when: string
+  when: Date
   current?: boolean
   icon: typeof Laptop
 }
 
+/** Dates are `Date`s, not strings, and formatting is the browser's.
+ *
+ *  "12 Mar 2026" hardcoded is wrong in most of the world before anyone translates a
+ *  word — day and month swap, the separator changes, the month name is English, and
+ *  in Korean the year comes first. `Intl` already knows all of that for whatever
+ *  locale the person is actually using, and `RelativeTimeFormat` knows that "3일 전"
+ *  is not "3 days ago" with the words replaced.
+ *
+ *  Left to the browser's own locale here. Pass one explicitly if your app lets people
+ *  choose a locale separately from their system. */
+const date = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" })
+const relative = new Intl.RelativeTimeFormat(undefined, { numeric: "auto" })
+
+const MINUTE = 60_000
+const UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ["year", 365 * 24 * 60 * MINUTE],
+  ["month", 30 * 24 * 60 * MINUTE],
+  ["day", 24 * 60 * MINUTE],
+  ["hour", 60 * MINUTE],
+  ["minute", MINUTE],
+]
+
+/** "3 days ago" / "3일 전" / "il y a 3 jours" — picking the largest unit that fits,
+ *  the way a person would say it. `numeric: "auto"` is what turns "1 day ago" into
+ *  "yesterday" where the language has a word for it. */
+function ago(when: Date, now = Date.now()) {
+  const elapsed = when.getTime() - now
+  for (const [unit, ms] of UNITS) {
+    if (Math.abs(elapsed) >= ms) return relative.format(Math.round(elapsed / ms), unit)
+  }
+  // Seconds rather than minutes for the "just happened" case: every locale has a
+  // word for it ("now", "지금", "maintenant"), where zero minutes produces the
+  // literal and useless "this minute" / "현재 분".
+  return relative.format(0, "second")
+}
+
+const daysAgo = (n: number) => new Date(Date.now() - n * 24 * 60 * MINUTE)
+const hoursAgo = (n: number) => new Date(Date.now() - n * 60 * MINUTE)
+
 const PASSKEYS: Passkey[] = [
-  { id: "p1", name: "MacBook Pro — Touch ID", added: "12 Mar 2026", lastUsed: "today" },
-  { id: "p2", name: "iPhone 17", added: "4 Jan 2026", lastUsed: "3 days ago" },
-  { id: "p3", name: "YubiKey 5C", added: "22 Nov 2025", lastUsed: "2 months ago" },
+  { id: "p1", name: "MacBook Pro — Touch ID", added: daysAgo(180), lastUsed: hoursAgo(3) },
+  { id: "p2", name: "iPhone 17", added: daysAgo(250), lastUsed: daysAgo(3) },
+  { id: "p3", name: "YubiKey 5C", added: daysAgo(300), lastUsed: daysAgo(60) },
 ]
 
 const SESSIONS: Session[] = [
-  { id: "s1", device: "Chrome on macOS", where: "Seoul, KR", when: "now", current: true, icon: Laptop },
-  { id: "s2", device: "Safari on iOS", where: "Seoul, KR", when: "2 hours ago", icon: Smartphone },
-  { id: "s3", device: "Firefox on Windows", where: "Frankfurt, DE", when: "6 days ago", icon: Globe },
+  { id: "s1", device: "Chrome on macOS", where: "Seoul, KR", when: new Date(), current: true, icon: Laptop },
+  { id: "s2", device: "Safari on iOS", where: "Seoul, KR", when: hoursAgo(2), icon: Smartphone },
+  { id: "s3", device: "Firefox on Windows", where: "Frankfurt, DE", when: daysAgo(6), icon: Globe },
 ]
 
 export function Profile() {
@@ -84,7 +123,7 @@ export function Profile() {
   const endSession = async (session: Session) => {
     const ok = await confirm({
       title: `Sign out ${session.device}?`,
-      message: `Last used ${session.when}, from ${session.where}.`,
+      message: `Last used ${ago(session.when)}, from ${session.where}.`,
       destructive: true,
       confirmText: "Sign out",
     })
@@ -211,7 +250,11 @@ export function Profile() {
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">{key.name}</span>
                     <span className="dp-num block truncate text-xs text-muted-foreground">
-                      Added {key.added} · used {key.lastUsed}
+                      {/* `<time>` so the machine-readable value survives the
+                          formatting, and a screen reader can be given the full date. */}
+                      Added <time dateTime={key.added.toISOString()}>{date.format(key.added)}</time>
+                      {" · used "}
+                      <time dateTime={key.lastUsed.toISOString()}>{ago(key.lastUsed)}</time>
                     </span>
                   </span>
                   <Button
@@ -274,7 +317,8 @@ export function Profile() {
                     )}
                   </span>
                   <span className="block truncate text-xs text-muted-foreground">
-                    {session.where} · {session.when}
+                    {session.where} ·{" "}
+                    <time dateTime={session.when.toISOString()}>{ago(session.when)}</time>
                   </span>
                 </span>
                 {!session.current && (

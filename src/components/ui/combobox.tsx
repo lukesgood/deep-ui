@@ -21,7 +21,7 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
     <div
       data-slot="combobox-input-wrapper"
       className={cn(
-        "flex h-8 w-full items-center gap-1.5 rounded-lg border border-input bg-transparent pr-1 pl-2.5 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 has-disabled:opacity-50 dark:bg-input/30",
+        "flex h-8 w-full items-center gap-1.5 rounded-lg border border-input bg-transparent pe-1 ps-2.5 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 has-disabled:opacity-50 dark:bg-input/30",
         className
       )}
     >
@@ -83,13 +83,13 @@ function ComboboxItem({ className, children, ...props }: ComboboxPrimitive.Item.
     <ComboboxPrimitive.Item
       data-slot="combobox-item"
       className={cn(
-        "relative flex cursor-default items-center gap-1.5 rounded-md py-1 pr-8 pl-1.5 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
+        "relative flex cursor-default items-center gap-1.5 rounded-md py-1 pe-8 ps-1.5 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50",
         className
       )}
       {...props}
     >
       {children}
-      <ComboboxPrimitive.ItemIndicator className="absolute right-2 flex items-center">
+      <ComboboxPrimitive.ItemIndicator className="absolute end-2 flex items-center">
         <CheckIcon className="size-4" />
       </ComboboxPrimitive.ItemIndicator>
     </ComboboxPrimitive.Item>

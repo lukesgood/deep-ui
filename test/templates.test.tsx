@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest"
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react"
 
 import { AssistantShell } from "../templates/assistant-shell"
 import { SignIn } from "../templates/sign-in"
@@ -153,4 +153,37 @@ test("the passkey step says what is happening and offers a way out", () => {
   fireEvent.click(screen.getByRole("button", { name: "Continue with a passkey" }))
   expect(screen.getByRole("status").textContent).toContain("Waiting for your passkey")
   expect(screen.getByRole("button", { name: "Use another method" })).toBeTruthy()
+})
+
+/* ── dates ────────────────────────────────────────────────────────────────── */
+
+test("dates are formatted by the browser, not written out in English", async () => {
+  const { ToastProvider } = await import("@/lib/toast")
+  const { ConfirmProvider } = await import("@/lib/confirm")
+  const { Profile } = await import("../templates/profile")
+  setViewport(false)
+  render(
+    <ToastProvider>
+      <ConfirmProvider>
+        <Profile />
+      </ConfirmProvider>
+    </ToastProvider>
+  )
+
+  // Every date carries a machine-readable value alongside whatever the locale
+  // renders, so the formatting can change without losing the actual instant.
+  const times = Array.from(document.querySelectorAll("time"))
+  expect(times.length).toBeGreaterThan(0)
+  for (const t of times) {
+    expect(t.getAttribute("datetime")).toMatch(/^\d{4}-\d{2}-\d{2}T/)
+    expect(t.textContent?.trim()).not.toBe("")
+  }
+
+  // Positive, not a negative regex over the whole page: every session row must carry
+  // a <time>, so replacing one with a literal string fails here rather than sliding
+  // past an assertion that was only ever looking for English.
+  for (const device of ["Chrome on macOS", "Safari on iOS", "Firefox on Windows"]) {
+    const row = screen.getByText(device).closest("li")!
+    expect(within(row).getByText((_, el) => el?.tagName === "TIME")).toBeTruthy()
+  }
 })

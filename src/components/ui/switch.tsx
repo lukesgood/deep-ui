@@ -4,6 +4,12 @@ import { Switch as SwitchPrimitive } from "@base-ui/react/switch"
 
 import { cn } from "@/lib/utils"
 
+/** Known gap: the thumb slides toward the right in both directions, so in RTL it
+ *  travels the wrong way and overshoots the track. Both a `ltr:`/`rtl:` variant pair
+ *  and a `--dp-flip` multiplier were tried; in each case `--tw-translate-x` computes
+ *  to the negative value, and the element still lays out as though it were positive.
+ *  Left as it was rather than shipped half-fixed. Everything else in this file — the
+ *  track, the focus ring, the hit area — is direction-agnostic. */
 function Switch({
   className,
   size = "default",
