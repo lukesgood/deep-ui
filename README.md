@@ -598,7 +598,7 @@ One thing checked while fixing those, because it would have made the tooltip gap
 a sidebar collapsed to icons keeps its buttons' names. The label is clipped by `overflow`,
 not removed from the accessibility tree.
 
-**Three of these are now held by tests**, because half of this list turns out to be facts
+**Four of these are now held by tests**, because half of this list turns out to be facts
 about the DOM rather than facts about what a reader says out loud. "Does Escape return
 focus to the trigger" is answerable without a screen reader; "does a streaming answer
 announce once or forty times" is not. `test/keyboard.test.tsx` takes the answerable half,
@@ -609,6 +609,7 @@ actually notice.
 |---|---|---|
 | **Focus** | Tab stays inside an open Dialog; Dialog, AlertDialog and Sheet all return focus to the trigger; Combobox moves `aria-activedescendant` without moving focus off the input | whether the place focus lands *reads* sensibly; the sidebar's mobile Sheet |
 | **State** | Accordion and Collapsible `aria-expanded`; Toggle `aria-pressed`; ToggleGroup as one tab stop with arrow keys inside; Tabs selection, and that arrowing does not activate | whether the panel is announced on switch; the sidebar's own collapsed state |
+| **Naming** | every control in every primitive has a non-empty accessible name, computed the way a browser computes it; `OtpField`'s boxes are told apart from one another | whether each name is a *good* name — "Show options" at the moment it is read |
 | **Forms** | a `Field` error reaches the control through `aria-describedby`, after the description rather than before it; `PasswordInput`'s toggle renames itself when the password shows | whether a `Fieldset` legend is announced when focus enters the group |
 
 **Still needs a person with a screen reader.** Ordered by how badly it goes wrong when it
@@ -619,9 +620,6 @@ is wrong:
   the rest as `status` — and does a burst of three announce as three? Does
   `ConversationPending` say anything useful? (`test/live-region.test.tsx` establishes the
   DOM half: a streaming answer changes text in place and adds no nodes.)
-- **Naming.** Every icon-only control: `SidebarTrigger`, `ComposerSubmit`,
-  `ConversationActions`, the toast dismiss, the pagination arrows. Does `OtpField`
-  announce which box you are in?
 - **Reading order.** In `templates/assistant-shell`, does the docked panel come after the
   main content or interrupt it? Does the citation list read in a sensible place relative
   to the answer that cites it?
@@ -696,7 +694,7 @@ npm run check        # everything below, which is exactly what CI runs
 ```bash
 npm run typecheck       # the template and the tests
 npm run lint            # jsx-a11y and react-hooks; not a style tool
-npm test                # 164 tests — every component mounts, plus the behaviour above
+npm test                # 214 tests — every component mounts, plus the behaviour above
 npm run verify:tests    # breaks the code on purpose; the tests have to notice
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have

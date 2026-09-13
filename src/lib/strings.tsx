@@ -45,6 +45,10 @@ export const DEFAULT_STRINGS = {
   "numberField.decrement": "Decrease",
   "numberField.increment": "Increase",
 
+  // `{position}` and `{length}` are filled in at render. Named rather than positional
+  // because languages do not agree on the order: Korean says "6자리 중 3번째".
+  "otpField.digit": "Digit {position} of {length}",
+
   "pagination.label": "Pagination",
   "pagination.next": "Next",
   "pagination.nextLabel": "Go to the next page",
@@ -87,6 +91,23 @@ export function StringsProvider({
 export function useString(key: StringKey, override?: string): string {
   const strings = React.useContext(StringsContext)
   return override ?? strings?.[key] ?? DEFAULT_STRINGS[key]
+}
+
+/** A string with its `{placeholders}` filled in.
+ *
+ *  The one thing a flat dictionary of finished sentences cannot express is a sentence
+ *  with a number in the middle of it, and "Digit 3 of 6" is one. Concatenating the
+ *  pieces in English order would be the usual mistake: a translator needs to move the
+ *  number, so the whole sentence has to stay one string with named holes in it.
+ *
+ *  Deliberately not a template engine. No plurals, no formatting, no expressions —
+ *  `{name}` is replaced by `String(values[name])` and nothing else happens. A hole
+ *  with no value is left as written, so a half-finished translation shows `{length}`
+ *  rather than `undefined`. */
+export function format(template: string, values: Record<string, string | number>) {
+  return template.replace(/\{(\w+)\}/g, (whole, key) =>
+    key in values ? String(values[key]) : whole
+  )
 }
 
 /** For a component that needs several at once. */

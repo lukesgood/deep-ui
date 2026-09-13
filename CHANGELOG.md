@@ -37,6 +37,17 @@ your own copy, not just what moved in this repo.
 
 ### Changed
 
+- **`OtpFieldInput` now requires `index` and `length`.** They are what the position
+  label is built from, and making them required is how a hand-laid-out row — the
+  reason `OtpFieldInput` is exported at all — cannot quietly ship anonymous boxes.
+  The type checker asks; nothing else would have.
+  **In your copy:** if you lay out the boxes yourself, pass `index={i}` and `length`.
+  If you let `<OtpField length={6} />` render them, nothing changes.
+- **An `OtpField` needs a label of its own**, like any other input. Base UI routes the
+  field's label to the *first* box and ignores `aria-label` there, which is the right
+  split — arriving says what the field is, moving along says where you are — but it
+  means a field with no `<FieldLabel>` leaves the first box unnamed. The gallery had
+  exactly that: a styled `<span>` where a label belonged.
 - **`check:contrast` measures four palettes, not two** — light, dark, and each one again
   as the browser computes it under `prefers-contrast: more`. 232 pairs became 464. It
   had also been merging every `:root` block it found regardless of the at-rule around
@@ -71,6 +82,19 @@ your own copy, not just what moved in this repo.
   for that step too — but it was one ordering change away from silently skipping the
   step announcement.
   **In your copy:** re-copy `templates/sign-in.tsx` if you took it.
+
+- **`test/accessible-name.test.tsx`** — the "Naming" line of the audit list, taken as
+  far as a machine can take it: the real accessible name algorithm run over every
+  primitive, failing on any control that computes to nothing. It found one thing, and
+  it was the exact question the README had written down: **`OtpField` did not say which
+  box you were in.** Six identical inputs, no names at all.
+  **In your copy:** re-copy `components/ui/otp-field.tsx` and `lib/strings.tsx`.
+- **`format()` in `src/lib/strings.tsx`** — `"Digit {position} of {length}"`. A flat
+  dictionary of finished sentences cannot express a sentence with a number in the
+  middle of it, and concatenating the pieces in English order is the usual way to make
+  that untranslatable: Korean says "6자리 중 3번째", moving the number. Named holes, no
+  template engine — a hole with no value is left as written, so a half-finished
+  translation shows `{length}` rather than `undefined`.
 
 - **`test/keyboard.test.tsx`** — twelve tests covering the half of the accessibility
   audit list that does not need a person. Tab stays inside an open dialog; Dialog,

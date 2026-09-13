@@ -189,11 +189,22 @@ The suite is aimed at the failures this repo has actually had, not at a coverage
   progress bar that reports no number when it has none.
 - **the rules with a reason.** The composer not sending mid-IME-composition; the reveal
   toggle not submitting the form it sits in.
+- **every control has a name.** `test/accessible-name.test.tsx` runs the accessible
+  name algorithm — the real one, `dom-accessibility-api` — over every primitive in
+  `test/cases.tsx` and fails on any interactive element that computes to nothing. An
+  icon-only button with no name is a blank to a screen reader and looks perfectly fine
+  to everyone else, so nobody who can see it is able to report it. A new primitive is
+  covered the moment it gets a case, which the directory check makes compulsory.
 - **keyboard and focus.** `test/keyboard.test.tsx`: Tab stays inside an open dialog,
   Escape puts focus back on the trigger, a toolbar is one tab stop with arrow keys
   inside it, a combobox moves its highlight without moving focus off the input. These
   behaviours come from Base UI, which means they can regress on a version bump without
   a line of this repo changing — and nothing else here would notice.
+
+Write the cases in `test/cases.tsx` the way the README would tell somebody to write
+them. A fixture that cuts a corner a real caller would not cut turns into a finding
+that is not real — a bare `<Checkbox />` has no name because nobody labelled it, which
+says nothing about `Checkbox`.
 
 `src/lib/markdown.ts` is pure and covered separately. If you touch the parser, add a case
 — especially for what is *not* interpreted. Links are never turned into anchors and fence

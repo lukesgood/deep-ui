@@ -24,6 +24,10 @@
 import { execFileSync, execSync } from "node:child_process"
 import { readFileSync, writeFileSync } from "node:fs"
 
+/** `suite` defaults to the keyboard tests; naming injections point at their own file. */
+const KEYBOARD = "test/keyboard.test.tsx"
+const NAMING = "test/accessible-name.test.tsx"
+
 const CASES = [
   {
     test: "an open dialog keeps Tab inside it",
@@ -109,9 +113,38 @@ const CASES = [
     from: 'aria-label={revealed ? strings["passwordInput.hide"] : strings["passwordInput.show"]}',
     to: 'aria-label={strings["passwordInput.show"]}',
   },
-]
 
-const SUITE = "test/keyboard.test.tsx"
+  /* ── names on the controls the system renders itself ──────────────────────── */
+
+  {
+    suite: NAMING,
+    test: "the boxes of an OTP field are told apart",
+    file: "src/components/ui/otp-field.tsx",
+    breaks: "the per-box position label — six boxes all called \"Verification code\"",
+    from: "      aria-label={\n        index === 0 ? ariaLabel : ariaLabel ?? format(digit, { position: index + 1, length })\n      }\n",
+    to: "",
+  },
+  // Not injectable here: Base UI supplies its own English "Decrease"/"Increase" when
+  // ours is absent, so deleting the label leaves the button named and the naming test
+  // rightly green. What our label actually buys is translation, not a name — and that
+  // is check:tokens' job, not this one's.
+  {
+    suite: NAMING,
+    test: "sidebar names every control it renders",
+    file: "src/components/ui/sidebar.tsx",
+    breaks: "the sidebar trigger's name — an icon button with nothing else in it",
+    from: '      <span className="sr-only">{toggleLabel}</span>\n',
+    to: "",
+  },
+  {
+    suite: NAMING,
+    test: "composer names every control it renders",
+    file: "src/components/ui/composer.tsx",
+    breaks: "the send button's name, which changes with its state",
+    from: '      aria-label={busy ? strings["composer.stop"] : strings["composer.send"]}\n',
+    to: "",
+  },
+]
 
 /* ── refuse to start on top of uncommitted work ───────────────────────────── */
 
@@ -151,7 +184,7 @@ for (const c of CASES) {
   writeFileSync(c.file, original.replace(c.from, c.to))
   let caught = false
   try {
-    execFileSync("npx", ["vitest", "run", SUITE, "-t", c.test], { stdio: "pipe" })
+    execFileSync("npx", ["vitest", "run", c.suite ?? KEYBOARD, "-t", c.test], { stdio: "pipe" })
   } catch {
     caught = true
   }

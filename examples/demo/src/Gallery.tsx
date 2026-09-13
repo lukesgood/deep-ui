@@ -642,13 +642,15 @@ function FormsSection() {
             <Label htmlFor="pw">Password</Label>
             <PasswordInput id="pw" autoComplete="new-password" placeholder="At least 12 characters" />
           </div>
-          <div className="space-y-1.5">
-            <span className="block text-sm font-medium">Verification code</span>
-            <OtpField length={6} />
-            <p className="text-xs text-muted-foreground">
+          {/* A Field, not a styled span: the first box takes the field's own label,
+              so a label that is not a label leaves it unnamed. */}
+          <Field name="code">
+            <FieldLabel>Verification code</FieldLabel>
+            <FieldControl render={<OtpField length={6} />} />
+            <FieldDescription>
               One value underneath, so a pasted code fills every box.
-            </p>
-          </div>
+            </FieldDescription>
+          </Field>
         </div>
       </Panel>
 
