@@ -37,6 +37,17 @@ your own copy, not just what moved in this repo.
 
 ### Changed
 
+- **`PaginationLink` takes a `render` prop**, like the rest of the system. It still
+  renders an `<a>` by default — pages with URLs should be links — but a client-side
+  table has no URLs to link to, and an `<a href="#">` that calls `preventDefault`
+  announces as a link and offers to open in a new tab, neither of which is true.
+  `render={<button type="button" />}` is the honest version. `PaginationPrevious` and
+  `PaginationNext` inherit it.
+  **In your copy:** re-copy `components/ui/pagination.tsx`. Existing anchors are
+  unchanged.
+- **`check:tokens` exempts the `templates/` tree**, rather than four named files. An
+  allowlist that only grows is not saying anything — and every new template arrived
+  failing a rule it was never subject to.
 - **`OtpFieldInput` now requires `index` and `length`.** They are what the position
   label is built from, and making them required is how a hand-laid-out row — the
   reason `OtpFieldInput` is exported at all — cannot quietly ship anonymous boxes.
@@ -82,6 +93,14 @@ your own copy, not just what moved in this repo.
   for that step too — but it was one ordering change away from silently skipping the
   step announcement.
   **In your copy:** re-copy `templates/sign-in.tsx` if you took it.
+
+- **`templates/data-table.tsx`** — the composition people reach for first: a table
+  with a filter, a sort and pages. It exists for the four places that composition goes
+  wrong every time, all of which are invisible in a screenshot: the sort on a
+  `<th onClick>` that cannot be focused, a filter that rewrites the table without
+  saying so, twenty row menus all called "Actions", and pages that are `<a href="#">`
+  going nowhere. `test/data-table.test.tsx` holds the other version of each.
+  **In your copy:** new file; take it or leave it.
 
 - **`test/accessible-name.test.tsx`** — the "Naming" line of the audit list, taken as
   far as a machine can take it: the real accessible name algorithm run over every

@@ -463,7 +463,7 @@ get reinvented ad hoc on every page.
 
 ## Templates
 
-`src/` gives you parts; `templates/` gives you three whole screens to start from. They
+`src/` gives you parts; `templates/` gives you five whole screens to start from. They
 are copy-in the same way, and they import the primitives through the same `@/*` alias, so
 what you see in the gallery is what you get from the file.
 
@@ -472,6 +472,7 @@ what you see in the gallery is what you get from the file.
 | [`sign-in`](templates/sign-in.tsx) | Passkey, password and a sign-in link, with a second factor — one card, five steps |
 | [`profile`](templates/profile.tsx) | Identity, passkeys, active sessions, and the end of the road |
 | [`settings`](templates/settings.tsx) | Tabs, grouped fields, and a save bar that appears only once something changed |
+| [`data-table`](templates/data-table.tsx) | A table with the three controls a table always grows: filter, sort, pages |
 | [`assistant-shell`](templates/assistant-shell.tsx) | An app shell with the assistant docked on the right |
 
 Each is a starting point, not a component — copy it and change everything. What is worth
@@ -492,6 +493,14 @@ it covers the usernameless case.
 **A step change has to move focus.** `sign-in` swaps one card between five states. Doing
 that without moving focus leaves a keyboard or screen-reader user standing on a button
 that no longer exists, hearing nothing — so each step takes focus on its own heading.
+
+**A filter has to say what it did.** `data-table` is the composition people reach for
+first, and it goes wrong in the same four places every time. The sort lives on a
+`<th onClick>` that cannot be focused; the filter rewrites the table below it without
+announcing anything; twenty row menus are all called "Actions"; the pages are
+`<a href="#">` that go nowhere. Each is invisible in a screenshot and obvious to the
+person it breaks for. The template does the other version of all four, and
+`test/data-table.test.tsx` holds each one in place.
 
 **Let the browser validate, and supply only the wording.** `type="email" required` already
 knows what a malformed address is. A custom `validate` alongside it looks like it works
@@ -694,7 +703,7 @@ npm run check        # everything below, which is exactly what CI runs
 ```bash
 npm run typecheck       # the template and the tests
 npm run lint            # jsx-a11y and react-hooks; not a style tool
-npm test                # 214 tests — every component mounts, plus the behaviour above
+npm test                # 223 tests — every component mounts, plus the behaviour above
 npm run verify:tests    # breaks the code on purpose; the tests have to notice
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have

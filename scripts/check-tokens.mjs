@@ -58,12 +58,13 @@ const RULES = [
     // untranslated visible label is obvious, an untranslated aria-label is invisible
     // to everyone except the person relying on it.
     pattern: /(?:aria-label|title|placeholder)="[A-Za-z][^"]*"|sr-only">[A-Z][a-z]/g,
-    allowed: {
-      "templates/sign-in.tsx": "a template is example code — its words are meant to be rewritten, not translated",
-      "templates/profile.tsx": "same",
-      "templates/settings.tsx": "same",
-      "templates/assistant-shell.tsx": "same",
+    // A whole tree rather than a list of files. Naming each template here meant every
+    // new one arrived failing a rule it was never subject to, and the fix was always
+    // to add a line — an allowlist that only ever grows is not saying anything.
+    allowedIn: {
+      "templates/": "a template is example code — its words are meant to be rewritten, not translated",
     },
+    allowed: {},
   },
   {
     id: "raw-html",
@@ -105,7 +106,9 @@ for (const file of files) {
   scanned++
 
   for (const rule of RULES) {
-    const excuse = rule.allowed[rel]
+    const excuse =
+      rule.allowed[rel] ??
+      Object.entries(rule.allowedIn ?? {}).find(([prefix]) => rel.startsWith(prefix))?.[1]
     lines.forEach((line, i) => {
       const hits = line.match(rule.pattern)
       if (!hits) return
@@ -127,7 +130,10 @@ if (violations.length) {
   process.exit(1)
 }
 
-const exceptions = RULES.reduce((n, r) => n + Object.keys(r.allowed).length, 0)
+const exceptions = RULES.reduce(
+  (n, r) => n + Object.keys(r.allowed).length + Object.keys(r.allowedIn ?? {}).length,
+  0
+)
 console.log(
   `${scanned} files, ${RULES.length} rules, no violations` +
     (exceptions ? ` (${exceptions} documented exceptions)` : "")

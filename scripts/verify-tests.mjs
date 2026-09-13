@@ -27,6 +27,7 @@ import { readFileSync, writeFileSync } from "node:fs"
 /** `suite` defaults to the keyboard tests; naming injections point at their own file. */
 const KEYBOARD = "test/keyboard.test.tsx"
 const NAMING = "test/accessible-name.test.tsx"
+const TABLE = "test/data-table.test.tsx"
 
 const CASES = [
   {
@@ -143,6 +144,57 @@ const CASES = [
     breaks: "the send button's name, which changes with its state",
     from: '      aria-label={busy ? strings["composer.stop"] : strings["composer.send"]}\n',
     to: "",
+  },
+
+  /* ── the table template's details, which are the ones a screenshot cannot show ── */
+
+  {
+    suite: TABLE,
+    test: "a sortable column is sorted by a button",
+    file: "templates/data-table.tsx",
+    breaks: "aria-sort — the column stops saying which way it is sorted",
+    from: "    <TableHead aria-sort={active ? sort.direction : undefined} className={className}>",
+    to: "    <TableHead className={className}>",
+  },
+  {
+    suite: TABLE,
+    test: "the filter says how many rows are left",
+    file: "templates/data-table.tsx",
+    breaks: "the live region — the table rewrites itself and nothing says so",
+    from: '      <p role="status" aria-live="polite" className="text-xs text-muted-foreground">',
+    to: '      <p className="text-xs text-muted-foreground">',
+  },
+  {
+    suite: TABLE,
+    test: "each row's action button names its row",
+    file: "templates/data-table.tsx",
+    breaks: "the row name in the menu button's label — every row's menu becomes \"Actions\"",
+    from: "                        aria-label={`Actions for ${d.name}`}",
+    to: '                        aria-label="Actions"',
+  },
+  {
+    suite: TABLE,
+    test: "pages are buttons",
+    file: "templates/data-table.tsx",
+    breaks: "the render prop on the page numbers — they fall back to anchors going nowhere",
+    from: "                      render={<button type=\"button\" />}\n                      isActive={n === current}",
+    to: "                      isActive={n === current}",
+  },
+  {
+    suite: TABLE,
+    test: "the row's own name is a header for the row",
+    file: "templates/data-table.tsx",
+    breaks: "scope=\"row\" — the name cell defaults back to being a column header",
+    from: '                  <TableHead scope="row" className="font-mono font-normal">',
+    to: '                  <TableHead className="font-mono font-normal">',
+  },
+  {
+    suite: TABLE,
+    test: "filtering goes back to page one",
+    file: "templates/data-table.tsx",
+    breaks: "the page reset, so a filter can land you past the end of its own results",
+    from: "            onChange={(e) => refine(setQuery)(e.target.value)}",
+    to: "            onChange={(e) => setQuery(e.target.value)}",
   },
 ]
 

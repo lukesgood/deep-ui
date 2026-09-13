@@ -1,6 +1,8 @@
 "use client"
 
 import * as React from "react"
+import { mergeProps } from "@base-ui/react/merge-props"
+import { useRender } from "@base-ui/react/use-render"
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -18,7 +20,9 @@ import { cn } from "@/lib/utils"
  *  - the ellipsis is `aria-hidden`, since "…" read aloud between page numbers is noise
  *
  *  Render the items as links where the pages have URLs — a paginated list that cannot
- *  be linked to or opened in a new tab is a worse list. */
+ *  be linked to or opened in a new tab is a worse list. Where they do not, pass
+ *  `render={<button type="button" />}`: an `<a href="#">` that calls `preventDefault`
+ *  announces as a link, offers "open in new tab", and then does nothing. */
 function Pagination({
   className,
   label,
@@ -53,24 +57,29 @@ function PaginationLink({
   className,
   isActive,
   size = "icon-sm",
+  render,
   ...props
-}: React.ComponentProps<"a"> & {
+}: useRender.ComponentProps<"a"> & {
   isActive?: boolean
   size?: React.ComponentProps<typeof Button>["size"]
 }) {
-  return (
-    <a
-      data-slot="pagination-link"
-      aria-current={isActive ? "page" : undefined}
-      data-active={isActive}
-      className={cn(
-        buttonVariants({ variant: isActive ? "outline" : "ghost", size }),
-        "dp-num cursor-pointer",
-        className
-      )}
-      {...props}
-    />
-  )
+  return useRender({
+    defaultTagName: "a",
+    props: mergeProps<"a">(
+      {
+        "aria-current": isActive ? "page" : undefined,
+        className: cn(
+          buttonVariants({ variant: isActive ? "outline" : "ghost", size }),
+          "dp-num cursor-pointer",
+          className
+        ),
+      },
+      props
+    ),
+    render,
+    // `state` becomes `data-*`, which is where `data-active` comes from.
+    state: { slot: "pagination-link", active: isActive },
+  })
 }
 
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 
 import { AssistantShell } from "../../../templates/assistant-shell"
+import { DataTable } from "../../../templates/data-table"
 import { Profile } from "../../../templates/profile"
 import { Settings } from "../../../templates/settings"
 import { SignIn } from "../../../templates/sign-in"
@@ -12,6 +13,7 @@ export const TEMPLATES = [
   { id: "sign-in", title: "Sign in", render: SignIn },
   { id: "profile", title: "Your account", render: Profile },
   { id: "settings", title: "Settings", render: Settings },
+  { id: "data-table", title: "Data table", render: DataTable },
   { id: "assistant-shell", title: "Assistant shell", render: AssistantShell },
 ] as const
 

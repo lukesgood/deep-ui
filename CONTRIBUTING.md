@@ -87,7 +87,10 @@ noticed immediately; an English `aria-label` is noticed only by the person using
 screen reader, who has no way to report a bug nobody else can see.
 
 `check:tokens` fails on a literal `aria-label`, `title` or `placeholder` in `src/`.
-`templates/` is exempt — a template's words are example copy, meant to be rewritten.
+The whole `templates/` tree is exempt — a template's words are example copy, meant to
+be rewritten. The exemption is on the directory, not a list of files: naming each
+template meant every new one arrived failing a rule it was never subject to, and the
+fix was always to add a line.
 
 ### Gallery snippets are never written by hand
 
