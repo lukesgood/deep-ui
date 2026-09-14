@@ -27,7 +27,11 @@ function ComboboxInput({ className, ...props }: ComboboxPrimitive.Input.Props) {
     >
       <ComboboxPrimitive.Input
         data-slot="combobox-input"
-        className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+        // min-w-0: a flex item's default min-width is auto, not 0, so it will not
+        // shrink past its intrinsic content size — the browser's ~170px default for a
+        // text input. Without this, a narrow Combobox (w-40, say) overflows its
+        // wrapper and pushes the shrink-0 trigger button out past it.
+        className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
         {...props}
       />
       <ComboboxPrimitive.Trigger

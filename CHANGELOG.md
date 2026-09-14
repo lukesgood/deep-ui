@@ -12,6 +12,13 @@ your own copy, not just what moved in this repo.
 
 ### Fixed
 
+- **`ComboboxInput` overflowed a narrow `Combobox`.** The input sits in a flex wrapper
+  with `flex-1`, but a flex item's default `min-width` is `auto`, not `0` — it will not
+  shrink past its intrinsic width, the browser's ~170px default for a text input. Give
+  a `Combobox` a fixed width such as `w-40` and the input overflowed the wrapper,
+  pushing the `shrink-0` trigger button out past it; at a 1920px viewport the trigger
+  ended 27px past the edge, scrolling the whole page sideways.
+  **In your copy:** re-copy `components/ui/combobox.tsx`.
 - **Four files did not compile in the place they are meant to be copied to.** Vite's
   `react-ts` template turns on `verbatimModuleSyntax` and `noUnusedLocals`; under those,
   `error-box`, `confirm` and `toast` failed on `ReactNode` imported as a value rather
