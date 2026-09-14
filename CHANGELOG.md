@@ -12,6 +12,13 @@ your own copy, not just what moved in this repo.
 
 ### Fixed
 
+- `check:tokens` keyed its allowlists (`allowed`, `allowedIn`) with forward slashes,
+  but `relative(ROOT, file)` returns backslash paths on Windows — so every
+  documented exception (the select popup's `z-10`, the whole `templates/` tree)
+  failed to match and reported as a violation instead. Paths are normalised to `/`
+  once, where `rel` is computed, so an exception and the path it is reported under
+  are the same string on every OS.
+  **In your copy:** nothing; the linter never leaves this repo.
 - `verify:tests` and `check:docs` (`npm run verify:tests`, `npm run check:docs`) ran
   Vitest through `execFileSync("npx", …)`, with no shell behind it. On Windows `npx`
   only exists as `npx.cmd`, which that call cannot resolve, so both threw `ENOENT`
