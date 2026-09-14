@@ -23,6 +23,31 @@
  */
 import { execFileSync, execSync } from "node:child_process"
 import { readFileSync, writeFileSync } from "node:fs"
+import { createRequire } from "node:module"
+import { dirname, join } from "node:path"
+
+/** Vitest is a devDependency here, not a global — resolve its own CLI entry from
+ *  its package.json rather than shelling out to `npx`. `execFileSync("npx", …)`
+ *  has no shell behind it, and on Windows `npx` only exists as `npx.cmd`, which
+ *  CreateProcess cannot resolve without one — it fails with ENOENT before a
+ *  single test runs, and every case below gets falsely marked `caught` because
+ *  that throw lands in the same catch block a real test failure would. */
+function vitestBin() {
+  const require = createRequire(import.meta.url)
+  const pkgPath = require.resolve("vitest/package.json")
+  return join(dirname(pkgPath), require(pkgPath).bin.vitest)
+}
+
+/** There is no `.gitattributes` pinning line endings, so a Windows checkout with
+ *  the common `core.autocrlf=true` setting has `\r\n` in `src/` where these
+ *  injection strings — written with a plain `\n` — expect it. Matched literally,
+ *  that turns a correct entry into a false `STALE`: a real injection site reads
+ *  as moved when it has only been re-lined. Match the file's own ending instead of
+ *  assuming LF; on a POSIX checkout, already LF, this is a no-op. */
+function forFile(text, str) {
+  const eol = text.includes("\r\n") ? "\r\n" : "\n"
+  return str.replace(/\n/g, eol)
+}
 
 /** `suite` defaults to the keyboard tests; naming injections point at their own file. */
 const KEYBOARD = "test/keyboard.test.tsx"
@@ -240,17 +265,21 @@ for (const signal of ["SIGINT", "SIGTERM", "uncaughtException"]) {
 let missed = 0
 for (const c of CASES) {
   const original = originals.get(c.file)
-  if (!original.includes(c.from)) {
+  const from = forFile(original, c.from)
+  const to = forFile(original, c.to)
+  if (!original.includes(from)) {
     console.log(`  STALE   ${c.test}`)
     console.log(`          the injection site has moved in ${c.file}; fix this entry`)
     missed++
     continue
   }
 
-  writeFileSync(c.file, original.replace(c.from, c.to))
+  writeFileSync(c.file, original.replace(from, to))
   let caught = false
   try {
-    execFileSync("npx", ["vitest", "run", c.suite ?? KEYBOARD, "-t", c.test], { stdio: "pipe" })
+    execFileSync(process.execPath, [vitestBin(), "run", c.suite ?? KEYBOARD, "-t", c.test], {
+      stdio: "pipe",
+    })
   } catch {
     caught = true
   }

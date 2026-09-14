@@ -101,7 +101,10 @@ const violations = []
 let scanned = 0
 
 for (const file of files) {
-  const rel = relative(ROOT, file)
+  // `relative()` returns backslash-separated paths on Windows, but the allowlists
+  // below and the violation report are written with `/`. Normalise once, here, so
+  // an exception matches and a reported path reads the same on every OS.
+  const rel = relative(ROOT, file).split("\\").join("/")
   const lines = readFileSync(file, "utf8").split("\n")
   scanned++
 

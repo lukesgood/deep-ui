@@ -12,15 +12,27 @@
 
 import { execFileSync } from "node:child_process"
 import { readdirSync, readFileSync } from "node:fs"
-import { join } from "node:path"
+import { createRequire } from "node:module"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url))
 const read = (file) => readFileSync(join(ROOT, file), "utf8")
 
+/** Vitest is a devDependency here, not a global — resolve its own CLI entry from
+ *  its package.json rather than shelling out to `npx`. `execFileSync("npx", …)`
+ *  has no shell behind it, and on Windows `npx` only exists as `npx.cmd`, which
+ *  CreateProcess cannot resolve without one — it throws ENOENT before a single
+ *  test runs. */
+function vitestBin() {
+  const require = createRequire(import.meta.url)
+  const pkgPath = require.resolve("vitest/package.json")
+  return join(dirname(pkgPath), require(pkgPath).bin.vitest)
+}
+
 /** Ask the tools themselves rather than trusting a second copy of the number. */
 function countTests() {
-  const out = execFileSync("npx", ["vitest", "run", "--reporter=json"], {
+  const out = execFileSync(process.execPath, [vitestBin(), "run", "--reporter=json"], {
     cwd: ROOT,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "ignore"],
