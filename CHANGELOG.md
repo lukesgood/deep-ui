@@ -88,6 +88,23 @@ your own copy, not just what moved in this repo.
 
 ### Added
 
+- **`scripts/check-palette.mjs`** (`npm run check:palette`) — the chart ramp, measured
+  the way a colour-blind reader sees it. The README said the five series are at least 53
+  degrees apart in hue, which is true and was never enough: hue distance says nothing
+  about protan or deutan vision, and `--chart-4` beside `--chart-5` is green beside
+  orange, the textbook deutan confusion. The check simulates protan, deutan and tritan
+  vision (Machado et al. 2009) and holds neighbouring series ΔE 8 apart in OKLab — 6 to 8
+  is a warning, legal only with direct labels — plus ΔE 15 with normal vision, a
+  lightness band for each ground, and a chroma floor. **It fails on the current tokens,
+  on purpose:** slots 4 and 5 are ΔE 4.5 apart for a deutan reader in the light theme and
+  2.4 for a protan reader in the dark, and four dark series sit above the band. The token
+  change is a separate step, because it changes how every chart looks. The parsing moved
+  to `scripts/lib/tokens.mjs`, shared with `check:contrast`, whose output is unchanged
+  to the byte.
+  **In your copy:** no token has moved yet. If a chart puts series 4 and 5 side by side,
+  label them directly until it does. If you re-themed the ramp, copy `scripts/check-palette.mjs`
+  and `scripts/lib/` and run it against your own `tokens.css`.
+
 - **Every gallery panel now shows its own source**, under a Code button with a copy
   action. The snippet is not written anywhere: `examples/demo/vite-plugin-panel-source.ts`
   reads the JSX children of each `<Panel>` out of the gallery at build time, so the code

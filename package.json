@@ -24,11 +24,12 @@
     "check:tokens": "node scripts/check-tokens.mjs",
     "check:portable": "node scripts/check-portable.mjs",
     "check:contrast": "node scripts/check-contrast.mjs",
+    "check:palette": "node scripts/check-palette.mjs",
     "check:selectors": "node scripts/check-selectors.mjs",
     "check:docs": "node scripts/check-docs.mjs",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --max-warnings 0",
-    "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm run lint && npm test && npm run verify:tests && npm run check:tokens && npm run check:portable && npm run check:contrast && npm run check:selectors && npm run check:docs && npm run demo:build",
+    "check": "npm run typecheck && npm run typecheck -w deep-ui-demo && npm run lint && npm test && npm run verify:tests && npm run check:tokens && npm run check:portable && npm run check:contrast && npm run check:palette && npm run check:selectors && npm run check:docs && npm run demo:build",
     "demo": "npm run dev -w deep-ui-demo",
     "demo:build": "npm run build -w deep-ui-demo",
     "size": "node scripts/measure-size.mjs"

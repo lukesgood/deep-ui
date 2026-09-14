@@ -7,5 +7,6 @@
 - [ ] If it changes how something *looks*, that is said above — a reviewer cannot
       infer a visual change from a diff
 - [ ] If it adds a component, it has a case in `test/smoke.test.tsx`
-- [ ] If it changes a token, `npm run check:contrast` still passes
+- [ ] If it changes a token, `npm run check:contrast` still passes, and for a chart
+      colour `npm run check:palette` too
 - [ ] If it adds a test, the thing it covers was broken once to watch it go red

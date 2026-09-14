@@ -54,6 +54,9 @@ jobs:
       - name: Palette contrast
         run: npm run check:contrast
 
+      - name: Palette colour-blind separation
+        run: npm run check:palette
+
       - name: Dead selectors
         run: npm run check:selectors
 
