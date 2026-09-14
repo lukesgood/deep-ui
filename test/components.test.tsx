@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/pagination"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Progress, ProgressTrack } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 afterEach(cleanup)
 
@@ -188,4 +189,34 @@ test("the combobox input can shrink below its intrinsic width", () => {
   )
   const input = screen.getByRole("combobox", { name: "Region" })
   expect(input.className).toMatch(/(^|\s)min-w-0(\s|$)/)
+})
+
+/* ── Select ────────────────────────────────────────────────────────────────── */
+
+test("a select trigger shows the raw value until items tells it the item's label", () => {
+  // Base UI's Select.Value only ever sees the value string unless Select.Root gets
+  // an `items` map (or SelectValue gets a children function) — it never reads the
+  // label out of the SelectItem children rendered underneath it.
+  const { unmount } = render(
+    <Select value="all">
+      <SelectTrigger aria-label="Level"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All levels</SelectItem>
+        <SelectItem value="error">Error</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+  expect(document.querySelector('[data-slot="select-value"]')!.textContent).toBe("all")
+  unmount()
+
+  render(
+    <Select value="all" items={{ all: "All levels", error: "Error" }}>
+      <SelectTrigger aria-label="Level"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All levels</SelectItem>
+        <SelectItem value="error">Error</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+  expect(document.querySelector('[data-slot="select-value"]')!.textContent).toBe("All levels")
 })

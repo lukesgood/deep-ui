@@ -703,7 +703,7 @@ npm run check        # everything below, which is exactly what CI runs
 ```bash
 npm run typecheck       # the template and the tests
 npm run lint            # jsx-a11y and react-hooks; not a style tool
-npm test                # 224 tests — every component mounts, plus the behaviour above
+npm test                # 226 tests — every component mounts, plus the behaviour above
 npm run verify:tests    # breaks the code on purpose; the tests have to notice
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have
