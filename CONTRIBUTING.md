@@ -35,8 +35,8 @@ npm run check
 ```
 
 That runs everything CI runs: typecheck of the template and the demo, the parser tests,
-the token linter, the palette contrast check, and a demo build. CI runs the same steps on
-Node 22 and 24.
+the token linter, the palette contrast and colour-blind checks, and a demo build. CI runs
+the same steps on Node 22 and 24.
 
 ## The rules that are actually enforced
 
@@ -134,6 +134,8 @@ scroll it at all, which is not something the rule can see.
 npm run check:tokens                  # literal colours, raw z-index, one-off type sizes
 npm run check:contrast                # summary
 npm run check:contrast -- --verbose   # every pair, with its ratio
+npm run check:palette                 # the chart ramp under colour-blindness simulation
+npm run check:palette -- --verbose    # every measurement, plus all pairs and status proximity
 npm run check:selectors               # rules in tokens.css that point at nothing
 ```
 
@@ -162,6 +164,15 @@ the script with a reason. If you add an exclusion, say why in the same place.
 For the chart ramp specifically: categorical series are told apart by **hue**, not
 lightness. Keep the five at least ~50 degrees apart. An earlier ramp had two teals
 three degrees apart, which is one series as far as a reader is concerned.
+
+Hue spacing is not enough on its own, so `check:palette` measures the ramp the way a
+colour-blind reader sees it: neighbouring slots under simulated protan, deutan and tritan
+vision (ΔE 8 in OKLab, 6–8 a warning), with normal vision (ΔE 15), and a lightness band
+for each ground. It reads tokens through the same parser as `check:contrast`
+(`scripts/lib/tokens.mjs`), and the thresholds are in `scripts/lib/palette.mjs` — if you
+change one, say why there. Slot order is part of the copy-paste contract: a chart library
+hands series out in that order, so moving a colour to a different slot changes what
+"series 4" looks like in every existing copy.
 
 ### Unavailable is two states, not one
 

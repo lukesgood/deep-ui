@@ -13,37 +13,16 @@
  * Anything it cannot parse is a failure, not a skip. A checker that quietly
  * ignores what it does not understand reports green for the wrong reason.
  *
+ * The parsing lives in scripts/lib/tokens.mjs, shared with check-palette.mjs.
+ *
  *   node scripts/check-contrast.mjs [--verbose]
  */
 
-import { readFileSync } from "node:fs"
-import { fileURLToPath } from "node:url"
+import { hex, over, readThemes } from "./lib/tokens.mjs"
 
-const TOKENS = fileURLToPath(new URL("../src/styles/tokens.css", import.meta.url))
 const VERBOSE = process.argv.includes("--verbose")
 
 /* ── colour ───────────────────────────────────────────────────────────────── */
-
-/** #rgb / #rrggbb / rgb(r g b) / rgb(r g b / a) -> [r, g, b, a]. */
-function parseColor(raw) {
-  const v = raw.trim()
-  let m = v.match(/^#([0-9a-f]{3})$/i)
-  if (m) return [...[...m[1]].map((c) => parseInt(c + c, 16)), 1]
-  m = v.match(/^#([0-9a-f]{6})$/i)
-  if (m) return [0, 2, 4].map((i) => parseInt(m[1].slice(i, i + 2), 16)).concat(1)
-  m = v.match(/^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)(?:\s*[/,]\s*([\d.]+%?))?\s*\)$/i)
-  if (m) {
-    const a = m[4] === undefined ? 1 : m[4].endsWith("%") ? parseFloat(m[4]) / 100 : parseFloat(m[4])
-    return [+m[1], +m[2], +m[3], a]
-  }
-  return null
-}
-
-/** Composite a possibly-translucent colour onto an opaque one. */
-function over(fg, bg) {
-  const a = fg[3]
-  return [0, 1, 2].map((i) => fg[i] * a + bg[i] * (1 - a)).concat(1)
-}
 
 const channel = (c) => {
   const s = c / 255
@@ -63,45 +42,6 @@ function contrast(fg, bg, ground = bg) {
 }
 
 const tint = (color, ground, alpha = 0.1) => over([...color.slice(0, 3), alpha], ground)
-
-const hex = (c) =>
-  "#" + c.slice(0, 3).map((v) => Math.round(v).toString(16).padStart(2, "0")).join("")
-
-/* ── tokens ───────────────────────────────────────────────────────────────── */
-
-/** Custom properties for one selector, merged across every block that declares it.
- *  A stylesheet may open `:root` more than once — the palette in one place, the
- *  stacking ladder in another — and reading only the first block would measure
- *  whichever one happened to come first. */
-function readBlock(css, selector) {
-  const blocks = []
-  for (let i = css.indexOf(`${selector} {`); i !== -1; i = css.indexOf(`${selector} {`, i + 1)) {
-    // Brace-counted, not "the next `}` at column 0": inside an `@media` the block's
-    // own closing brace is indented, and stopping at the outer one would swallow
-    // every sibling rule after it — silently measuring the wrong palette.
-    let depth = 0
-    let end = -1
-    for (let j = css.indexOf("{", i); j < css.length; j++) {
-      if (css[j] === "{") depth++
-      else if (css[j] === "}" && --depth === 0) { end = j; break }
-    }
-    if (end === -1) throw new Error(`unterminated ${selector} block in tokens.css`)
-    blocks.push(css.slice(i, end))
-  }
-  if (!blocks.length) throw new Error(`${selector} block not found in tokens.css`)
-  const out = {}
-  for (const line of blocks.join("\n").split("\n")) {
-    const m = line.match(/^\s*(--[\w-]+)\s*:\s*([^;]+);/)
-    if (!m) continue
-    // Gradients, shadows and font stacks are not single colours; skip by shape.
-    if (/gradient|,/.test(m[2]) && !/^rgba?\(/i.test(m[2].trim())) continue
-    const color = parseColor(m[2])
-    if (color) out[m[1]] = color
-    else if (/^--(dp-)?(background|foreground|card|popover|primary|secondary|muted|accent|destructive|border|input|ring|sidebar|chart|good|warn|bad|managed|aqua)/.test(m[1]))
-      out[m[1]] = { unparsed: m[2].trim() }
-  }
-  return out
-}
 
 /* ── what gets measured ───────────────────────────────────────────────────── */
 
@@ -143,55 +83,9 @@ const EXCLUDED = {
 
 /* ── run ──────────────────────────────────────────────────────────────────── */
 
-const css = readFileSync(TOKENS, "utf8")
-
-/** The stylesheet region for one at-rule, or "" when it is not there.
- *  Brace-counted rather than regex-matched, because these blocks nest. */
-function atRule(source, prelude) {
-  const start = source.indexOf(prelude)
-  if (start === -1) return ""
-  let depth = 0
-  for (let i = source.indexOf("{", start); i < source.length; i++) {
-    if (source[i] === "{") depth++
-    else if (source[i] === "}" && --depth === 0) return source.slice(start, i + 1)
-  }
-  throw new Error(`unterminated ${prelude} in tokens.css`)
-}
-
-/** Every `@media` region removed, so the base palette is read on its own.
- *
- *  Without this the print block's `.dark { --background: #ffffff }` merges into the
- *  dark theme and the whole dark palette measures against paper. Conditional
- *  palettes are real palettes and get measured — but as themes of their own, below,
- *  not folded into the one they override. */
-function stripMedia(source) {
-  let out = source
-  for (let i = out.indexOf("@media"); i !== -1; i = out.indexOf("@media")) {
-    const region = atRule(out.slice(i), "@media")
-    out = out.slice(0, i) + out.slice(i + region.length)
-  }
-  return out
-}
-
-const base = stripMedia(css)
-const light = readBlock(base, ":root")
-const dark = readBlock(base, ".dark")
-
-/** A conditional palette inherits everything it does not restate, so it is measured
- *  as the base with the overrides applied — the same thing the browser computes. */
-function variant(region, ground) {
-  if (!region) return null
-  const overrides = readBlock(region, ground === light ? ":root" : ".dark")
-  return { ...ground, ...overrides }
-}
-
-const moreContrast = atRule(css, "@media (prefers-contrast: more)")
-const themes = [
-  ["light", light],
-  ["dark", dark],
-  ["light, prefers-contrast: more", variant(moreContrast, light)],
-  ["dark, prefers-contrast: more", variant(moreContrast, dark)],
-].filter(([, T]) => T)
+/** Four palettes, not two: `prefers-contrast: more` is a palette too. See
+ *  `readThemes` for how a conditional palette is merged onto its base. */
+const themes = readThemes()
 
 let checks = 0
 const failures = []

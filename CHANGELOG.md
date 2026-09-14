@@ -88,6 +88,32 @@ your own copy, not just what moved in this repo.
 
 ### Added
 
+- **`scripts/check-palette.mjs`** (`npm run check:palette`) — the chart ramp, measured
+  the way a colour-blind reader sees it. The README said the five series are at least 53
+  degrees apart in hue, which is true and was never enough: hue distance says nothing
+  about protan or deutan vision, and `--chart-4` beside `--chart-5` is green beside
+  orange, the textbook deutan confusion. The check simulates protan, deutan and tritan
+  vision (Machado et al. 2009) and holds neighbouring series ΔE 8 apart in OKLab — 6 to 8
+  is a warning, legal only with direct labels — plus ΔE 15 with normal vision, a
+  lightness band for each ground, and a chroma floor. **It failed on the shipped tokens:**
+  slots 4 and 5 were ΔE 4.5 apart for a deutan reader in the light theme and 2.4 for a
+  protan reader in the dark, where four series also sat above the 0.48–0.67 lightness
+  band. Dark `--chart-5` (`#fbbd23`) was also ΔE 0.48 from `--dp-warn` (`#fbbf24`) —
+  close enough that a plain data series read as a warning. The parsing moved to
+  `scripts/lib/tokens.mjs`, shared with `check:contrast`, whose output is unchanged to
+  the byte.
+
+  **The ramp is retuned to pass.** Light moves one slot: `--chart-5` from `#d26d09` to
+  `#a25200` (hue held, only lightness and chroma come down). Dark moves further, because
+  the whole ramp sat above the band: `--chart-1` `#23bcd7` → `#00a4d1`, `--chart-2`
+  `#847ef7` → `#827cf5`, `--chart-3` `#e755c2` → `#e751ba`, `--chart-4` `#80cb4d` →
+  `#5ba866`, `--chart-5` `#fbbd23` → `#cc8300`. Slot order is unchanged.
+  **In your copy:** paste these into `tokens.css` — light `:root`:
+  `--chart-1: #0995ad; --chart-2: #5f58e4; --chart-3: #d756b7; --chart-4: #539924;
+  --chart-5: #a25200;` and dark `.dark`: `--chart-1: #00a4d1; --chart-2: #827cf5;
+  --chart-3: #e751ba; --chart-4: #5ba866; --chart-5: #cc8300;`. Slot order (1–5) is
+  unchanged, so nothing downstream needs to move — only the six hex values above.
+
 - **Every gallery panel now shows its own source**, under a Code button with a copy
   action. The snippet is not written anywhere: `examples/demo/vite-plugin-panel-source.ts`
   reads the JSX children of each `<Panel>` out of the gallery at build time, so the code

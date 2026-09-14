@@ -171,9 +171,17 @@ The light accent is a deeper aqua than the chart ramp's `#0995ad`, and that is d
 has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` stays a
 touch brighter. See [Accessibility](#accessibility).
 
-`--chart-1` … `--chart-5` are spaced at least 53 degrees apart in hue, in both themes.
-Categorical series are told apart by hue, not lightness — an earlier ramp had two teals
-three degrees apart, which is one series as far as a reader is concerned.
+`--chart-1` … `--chart-5` are spaced apart in hue — at least 54 degrees in the light
+theme, at least 50 in dark. Categorical series are told apart by hue, not lightness — an
+earlier ramp had two teals three degrees apart, which is one series as far as a reader is
+concerned.
+
+Hue spacing is necessary and not sufficient. It says nothing about what a colour-blind
+reader sees, and green beside orange — `--chart-4` beside `--chart-5` — is the textbook
+deutan confusion. So the ramp is also checked for colour-blind separation:
+`npm run check:palette` simulates protan, deutan and tritan vision and measures
+neighbouring series in OKLab, holding every pair at ΔE 8 or better (6–8 warns) under
+every simulation. See [Accessibility](#accessibility).
 
 ### Deep extras
 
@@ -580,6 +588,25 @@ so WCAG 1.4.11 covers it and it clears 3:1. `--border` is not, and is deliberate
 soft — it draws structure between sections rather than identifying a control, which is
 outside what 1.4.11 asks for.
 
+**The chart ramp is measured for colour-blind readers too.** Contrast says a series can be
+seen; it does not say two series can be told apart. `check:palette` simulates protanopia,
+deuteranopia and tritanopia (Machado et al. 2009, at full severity) over the same four
+palettes, and asks of the ramp in its slot order:
+
+- neighbouring series stay **ΔE 8** apart in OKLab under every simulation — 6 to 8 is a
+  warning, acceptable only where the chart also labels its series directly
+- neighbouring series stay **ΔE 15** apart with normal vision
+- every series sits inside a lightness band for its ground (OKLCH L 0.43–0.77 on light,
+  0.48–0.67 on dark) with chroma of at least 0.1
+
+Every pair rather than just neighbours, and how close each series comes to a status
+colour, are reported with `--verbose` as information, not gates.
+
+```bash
+npm run check:palette                 # summary
+npm run check:palette -- --verbose    # every measurement, every pair, nearest status colour
+```
+
 **What it does not guarantee.** The components are keyboard-operable and labelled, toasts
 announce (errors as `role="alert"`, the rest as `role="status"`), and
 `prefers-reduced-motion` and `prefers-contrast: more` are both honoured, but **none of
@@ -703,11 +730,12 @@ npm run check        # everything below, which is exactly what CI runs
 ```bash
 npm run typecheck       # the template and the tests
 npm run lint            # jsx-a11y and react-hooks; not a style tool
-npm test                # 224 tests — every component mounts, plus the behaviour above
+npm test                # 237 tests — every component mounts, plus the behaviour above
 npm run verify:tests    # breaks the code on purpose; the tests have to notice
 npm run check:tokens    # no literal colours, no raw z-index, no untranslatable labels
 npm run check:portable  # src/ imports nothing a copy would not have
 npm run check:contrast  # the palette, measured against tokens.css
+npm run check:palette   # the chart ramp, as a colour-blind reader sees it
 npm run check:selectors # rules in tokens.css that point at nothing
 npm run check:docs      # the numbers in this file, against the code they describe
 npm run demo:build      # builds examples/demo — catches what typecheck can't
