@@ -167,16 +167,18 @@
      a control and is deliberately left soft. */
   --input: #628f9a;
   --ring: #066c7d;
-  /* Data-viz categorical ramp. Series are told apart by HUE, not lightness, so
-     the five are spaced at least 53 degrees apart — the old ramp had two teals
-     3 degrees apart, which is one series as far as a reader is concerned. Each
+  /* Data-viz categorical ramp. Series are told apart by HUE, not lightness, and
+     each pair is kept at least ~50 degrees apart — the old ramp had two teals
+     3 degrees apart, which is one series as far as a reader is concerned. Hue
+     spacing alone says nothing about a colour-blind reader, so the ramp is also
+     checked for colour-blind separation: `npm run check:palette`. Each colour
      also clears 3:1 against every surface, since a thin plotted line is
      non-text content someone still has to see. */
   --chart-1: #0995ad;
   --chart-2: #5f58e4;
   --chart-3: #d756b7;
   --chart-4: #539924;
-  --chart-5: #d26d09;
+  --chart-5: #a25200;
   --radius: 0.7rem;
   /* sidebar = the sunken floor; active nav lifts to a surface */
   --sidebar: #e6eef0;
@@ -231,12 +233,14 @@
   --border: rgb(255 255 255 / 0.08);
   --input: rgb(255 255 255 / 0.335);  /* 3:1 against every dark surface */
   --ring: #22c3d6;
-  /* the same five hues, lifted into the brightness this ground wants */
-  --chart-1: #23bcd7;
-  --chart-2: #847ef7;
-  --chart-3: #e755c2;
-  --chart-4: #80cb4d;
-  --chart-5: #fbbd23;
+  /* Brought down into the brightness this ground wants. Three of five (1, 4, 5)
+     also get a hue nudge of ~12–13 degrees — a lightness-only move can't clear
+     the colour-blind gates here, see `npm run check:palette`. */
+  --chart-1: #00a4d1;
+  --chart-2: #827cf5;
+  --chart-3: #e751ba;
+  --chart-4: #5ba866;
+  --chart-5: #cc8300;
   --sidebar: #0a171b;
   --sidebar-foreground: #b8cbd1;
   --sidebar-primary: #22c3d6;

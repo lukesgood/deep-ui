@@ -171,18 +171,17 @@ The light accent is a deeper aqua than the chart ramp's `#0995ad`, and that is d
 has to clear 4.5:1. A chart fill is non-text and only owes 3:1, so `--chart-1` stays a
 touch brighter. See [Accessibility](#accessibility).
 
-`--chart-1` … `--chart-5` are spaced at least 53 degrees apart in hue, in both themes.
-Categorical series are told apart by hue, not lightness — an earlier ramp had two teals
-three degrees apart, which is one series as far as a reader is concerned.
+`--chart-1` … `--chart-5` are spaced apart in hue — at least 54 degrees in the light
+theme, at least 50 in dark. Categorical series are told apart by hue, not lightness — an
+earlier ramp had two teals three degrees apart, which is one series as far as a reader is
+concerned.
 
 Hue spacing is necessary and not sufficient. It says nothing about what a colour-blind
 reader sees, and green beside orange — `--chart-4` beside `--chart-5` — is the textbook
 deutan confusion. So the ramp is also checked for colour-blind separation:
 `npm run check:palette` simulates protan, deutan and tritan vision and measures
-neighbouring series in OKLab. **The current ramp does not pass it yet.** Slots 4 and 5
-are ΔE 4.5 apart for a deutan reader in the light theme and 2.4 for a protan reader in the
-dark, where four series also sit brighter than the band. Until the values change, label
-series 4 and 5 directly wherever they meet. See [Accessibility](#accessibility).
+neighbouring series in OKLab, holding every pair at ΔE 8 or better (6–8 warns) under
+every simulation. See [Accessibility](#accessibility).
 
 ### Deep extras
 
@@ -600,7 +599,6 @@ palettes, and asks of the ramp in its slot order:
 - every series sits inside a lightness band for its ground (OKLCH L 0.43–0.77 on light,
   0.48–0.67 on dark) with chroma of at least 0.1
 
-**The current ramp does not meet this yet** — see [the chart ramp](#standard-shadcn-tokens).
 Every pair rather than just neighbours, and how close each series comes to a status
 colour, are reported with `--verbose` as information, not gates.
 
