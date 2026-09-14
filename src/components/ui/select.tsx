@@ -6,6 +6,22 @@ import { Select as SelectPrimitive } from "@base-ui/react/select"
 import { cn } from "@/lib/utils"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
+/** Pass `items` — a `Record<string, ReactNode>`, or an array of `{ value, label }` —
+ *  or the trigger shows the raw `value` instead of the matching `SelectItem`'s label.
+ *  `SelectValue` never reads the label out of the `SelectItem`s rendered underneath
+ *  it; without `items` (or a children function on `SelectValue` itself) all it has
+ *  is the value, so `<Select value="all">` with `<SelectItem value="all">All
+ *  levels</SelectItem>` shows "all". Harmless while a value happens to read like its
+ *  own label — `"eu-west-1"` — and wrong the moment it does not.
+ *
+ *      <Select items={{ all: "All levels", error: "Error" }} value={level} onValueChange={setLevel}>
+ *        <SelectTrigger><SelectValue /></SelectTrigger>
+ *        <SelectContent>
+ *          <SelectItem value="all">All levels</SelectItem>
+ *          <SelectItem value="error">Error</SelectItem>
+ *        </SelectContent>
+ *      </Select>
+ */
 const Select = SelectPrimitive.Root
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {

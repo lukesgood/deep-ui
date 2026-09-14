@@ -2,6 +2,7 @@ import { afterEach, expect, test, vi } from "vitest"
 import { cleanup, fireEvent, render, screen } from "@testing-library/react"
 
 import { Button } from "@/components/ui/button"
+import { Combobox, ComboboxInput } from "@/components/ui/combobox"
 import { Composer, ComposerInput, ComposerSubmit } from "@/components/ui/composer"
 import { Conversation, ConversationMessage } from "@/components/ui/conversation"
 import {
@@ -13,6 +14,7 @@ import {
 } from "@/components/ui/pagination"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Progress, ProgressTrack } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 afterEach(cleanup)
 
@@ -170,4 +172,51 @@ test("pagination announces the current page rather than only highlighting it", (
   expect(screen.getByRole("navigation", { name: "Pagination" })).toBeTruthy()
   expect(screen.getByText("2").getAttribute("aria-current")).toBe("page")
   expect(screen.getByText("1").getAttribute("aria-current")).toBeNull()
+})
+
+/* ── Combobox ──────────────────────────────────────────────────────────────── */
+
+test("the combobox input can shrink below its intrinsic width", () => {
+  // happy-dom does not lay out, so this cannot show the overflow itself — a fixed-
+  // width Combobox (w-40, say) pushing its trigger button outside the container.
+  // What it can hold is the mechanism: a flex item's default min-width is auto, not
+  // 0, so without min-w-0 the input refuses to shrink past its intrinsic (~170px)
+  // width no matter how narrow the wrapper is asked to be.
+  render(
+    <Combobox items={["a"]}>
+      <ComboboxInput aria-label="Region" />
+    </Combobox>
+  )
+  const input = screen.getByRole("combobox", { name: "Region" })
+  expect(input.className).toMatch(/(^|\s)min-w-0(\s|$)/)
+})
+
+/* ── Select ────────────────────────────────────────────────────────────────── */
+
+test("a select trigger shows the raw value until items tells it the item's label", () => {
+  // Base UI's Select.Value only ever sees the value string unless Select.Root gets
+  // an `items` map (or SelectValue gets a children function) — it never reads the
+  // label out of the SelectItem children rendered underneath it.
+  const { unmount } = render(
+    <Select value="all">
+      <SelectTrigger aria-label="Level"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All levels</SelectItem>
+        <SelectItem value="error">Error</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+  expect(document.querySelector('[data-slot="select-value"]')!.textContent).toBe("all")
+  unmount()
+
+  render(
+    <Select value="all" items={{ all: "All levels", error: "Error" }}>
+      <SelectTrigger aria-label="Level"><SelectValue /></SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All levels</SelectItem>
+        <SelectItem value="error">Error</SelectItem>
+      </SelectContent>
+    </Select>
+  )
+  expect(document.querySelector('[data-slot="select-value"]')!.textContent).toBe("All levels")
 })
