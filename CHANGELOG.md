@@ -12,6 +12,17 @@ your own copy, not just what moved in this repo.
 
 ### Fixed
 
+- `verify:tests` and `check:docs` (`npm run verify:tests`, `npm run check:docs`) ran
+  Vitest through `execFileSync("npx", …)`, with no shell behind it. On Windows `npx`
+  only exists as `npx.cmd`, which that call cannot resolve, so both threw `ENOENT`
+  before a single test ran — `verify:tests` reported every injection unnoticed, and
+  `check:docs` failed outright. `verify:tests` also compared its injection strings
+  against `\n`-only source; a Windows checkout with `core.autocrlf` on has `\r\n`
+  there instead, so a real injection site read as moved and was reported `STALE`
+  regardless of the shell problem. Both scripts now resolve Vitest's own CLI entry
+  from its package.json and run it with `process.execPath`, and `verify:tests`
+  matches a file's actual line ending instead of assuming LF.
+  **In your copy:** nothing; test tooling never leaves this repo.
 - **Four files did not compile in the place they are meant to be copied to.** Vite's
   `react-ts` template turns on `verbatimModuleSyntax` and `noUnusedLocals`; under those,
   `error-box`, `confirm` and `toast` failed on `ReactNode` imported as a value rather
