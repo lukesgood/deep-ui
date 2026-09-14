@@ -146,6 +146,20 @@ const CASES = [
     to: "",
   },
 
+  // The other half of that change — dimming hung off `data-disabled` so it covers the
+  // aria-disabled case — is not injectable here. Tailwind's stylesheet is not loaded
+  // under happy-dom, so no test in this repo can see which pseudo-class an opacity
+  // came from. That one was checked in a browser instead, the way the print styles
+  // were. Claiming the test covers it is the exact thing this script exists to stop.
+  {
+    suite: "test/templates.test.tsx",
+    test: "the sign-in link step names the address it went to",
+    file: "templates/sign-in.tsx",
+    breaks: "reachability of the resend button while it counts down",
+    from: "        focusableWhenDisabled\n",
+    to: "",
+  },
+
   /* ── the table template's details, which are the ones a screenshot cannot show ── */
 
   {

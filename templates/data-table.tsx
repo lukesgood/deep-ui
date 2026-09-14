@@ -146,8 +146,12 @@ export function DataTable() {
     <main className="mx-auto w-full max-w-5xl space-y-4 p-6">
       <div className="space-y-1">
         <h1 className="text-xl font-semibold tracking-tight">Datasets</h1>
+        {/* Not "everything you have access to". This template has no idea who is
+            looking at it — `owner` is a column you can filter by, not a boundary —
+            and copy that implies a permission check nothing performs is the kind of
+            sentence somebody takes at face value. See SECURITY.md. */}
         <p className="text-sm text-muted-foreground">
-          Everything in the warehouse you have access to.
+          Every dataset in this workspace.
         </p>
       </div>
 

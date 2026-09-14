@@ -332,6 +332,10 @@ function LinkSent({ onBack }: { onBack: () => void }) {
         variant="outline"
         className="w-full"
         disabled={seconds > 0}
+        // The reason is right there in the label — "Resend in 24s" — and a plain
+        // `disabled` would put the button out of reach of the person most likely to
+        // need telling. Focusable, announced as dimmed, still not activatable.
+        focusableWhenDisabled
         onClick={() => setSeconds(RESEND_SECONDS)}
       >
         {seconds > 0 ? (

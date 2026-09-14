@@ -3,8 +3,31 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/** Two ways to be unavailable, and the difference matters.
+ *
+ *  `disabled` takes the control out of the tab order, so nobody arriving by keyboard
+ *  can land on it — which also means nobody can find out *why* it is unavailable. For
+ *  a control that is simply not applicable that is fine, and it is the right default.
+ *
+ *  For a control somebody is actively trying to use — a Submit that a validation
+ *  gate is holding, an action they lack permission for, a Resend that is counting
+ *  down — it is the wrong trade. `disabled focusableWhenDisabled` is Base UI's answer:
+ *  `aria-disabled="true"` instead of the native attribute, the button stays reachable
+ *  and announces itself as dimmed, and activation is still blocked (by mouse and by
+ *  keyboard — verified, not assumed). Put the reason in the label or a tooltip and it
+ *  becomes findable.
+ *
+ *  Which is why the dimming hangs off `data-disabled`, which Base UI sets in both
+ *  cases, rather than the `:disabled` pseudo-class, which matches only the first. It
+ *  used to be the pseudo-class, and the accessible option rendered at full opacity —
+ *  the system styled the worse choice and left the better one looking broken.
+ *
+ *  `pointer-events-none` stays on the native case only. An `aria-disabled` button has
+ *  to keep its pointer events or the tooltip explaining it cannot be hovered, and
+ *  Base UI is already refusing the click. */
+
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none data-disabled:opacity-50 aria-disabled:cursor-not-allowed aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

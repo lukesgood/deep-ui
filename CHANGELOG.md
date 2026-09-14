@@ -37,6 +37,19 @@ your own copy, not just what moved in this repo.
 
 ### Changed
 
+- **Button's dimming moved from `:disabled` to `data-disabled`.** Base UI sets
+  `data-disabled` in both cases; the pseudo-class matches only the native one — so an
+  `aria-disabled` button rendered at full opacity and looked enabled. The system was
+  styling the worse of the two choices and leaving the better one looking broken.
+  `pointer-events-none` stays on the native case: an `aria-disabled` button has to keep
+  its pointer events or the tooltip explaining it cannot be hovered.
+  **In your copy:** re-copy `components/ui/button.tsx`.
+- **`SECURITY.md` now states the authorisation boundary**, not just the authentication
+  one. There is no permission model in this repository and there should not be: a
+  design system cannot enforce access control, and every product's permission
+  vocabulary differs. What it can do is give you the means to *say* what the server
+  decided. `templates/data-table` said "everything you have access to" above a table
+  that filters nothing; it says what it actually shows now.
 - **`PaginationLink` takes a `render` prop**, like the rest of the system. It still
   renders an `<a>` by default — pages with URLs should be links — but a client-side
   table has no URLs to link to, and an `<a href="#">` that calls `preventDefault`
@@ -93,6 +106,15 @@ your own copy, not just what moved in this repo.
   for that step too — but it was one ordering change away from silently skipping the
   step announcement.
   **In your copy:** re-copy `templates/sign-in.tsx` if you took it.
+
+- **A control can be held back with a reason.** `<Button disabled focusableWhenDisabled>`
+  keeps the button reachable and announces it as dimmed, and Base UI still refuses to
+  activate it by mouse or by keyboard. Use it wherever somebody is actively trying to
+  use the control — a Submit a validation gate is holding, an action they lack
+  permission for, a countdown — and leave plain `disabled` for a control that is simply
+  not applicable.
+  **In your copy:** re-copy `components/ui/button.tsx`. Existing `disabled` is
+  unchanged.
 
 - **`templates/data-table.tsx`** — the composition people reach for first: a table
   with a filter, a sort and pages. It exists for the four places that composition goes

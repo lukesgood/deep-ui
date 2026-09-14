@@ -136,7 +136,15 @@ test("the sign-in link step names the address it went to, and gates the resend",
   // on screen — a typo is otherwise a silent dead end.
   expect(await screen.findByText(/luke@example\.com/)).toBeTruthy()
   expect(screen.getByRole("heading", { name: "Check your inbox" })).toBeTruthy()
-  expect(screen.getByRole("button", { name: /Resend in/ }).hasAttribute("disabled")).toBe(true)
+  // Unavailable, and still reachable. A native `disabled` would take the button out
+  // of the tab order, which puts the reason — "Resend in 24s", right there in its own
+  // label — out of reach of the person most likely to need it read to them.
+  const resend = screen.getByRole("button", { name: /Resend in/ })
+  expect(resend.getAttribute("aria-disabled")).toBe("true")
+  expect(resend.hasAttribute("disabled")).toBe(false)
+
+  resend.focus()
+  expect(document.activeElement).toBe(resend)
 })
 
 test("a step change moves focus, instead of leaving it on a button that is gone", async () => {

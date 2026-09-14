@@ -30,3 +30,22 @@ or `templates/`. If you find a way around either, that is a security issue:
 The components render what you give them. They do not sanitise, escape or validate
 application data beyond what React does by default, and `templates/` authenticates
 nothing — the sign-in screen is a layout, not an implementation.
+
+**They authorise nothing either.** There is no permission model anywhere in this
+repository: no roles, no policies, no notion of who is looking. `templates/data-table`
+has an `owner` column with four team names in it, and `owner` is something you can
+filter by — not a boundary. If you hand a component a row, it renders the row.
+
+This is not a gap to be filled here. A design system cannot enforce access control,
+because enforcement that happens in the browser is not enforcement; the server decides
+what leaves it, and the only safe assumption is that anything reaching the client was
+allowed to. What a design system can do is give you the means to *say* what the server
+decided — `EmptyState` already takes the words, `Badge` already carries a status, a
+control can be held back with a reason (see `components/ui/button.tsx`) — and those
+are deliberately unopinionated, because every product's permission vocabulary differs.
+
+One consequence worth stating, because it is a decision and not an accident: **"there
+is nothing here" and "there is something here you cannot see" are different
+sentences.** Which one you show is an information-disclosure choice — the second
+confirms a record exists — and it belongs to your product, not to this template. The
+templates say the first because they have nothing to hide.

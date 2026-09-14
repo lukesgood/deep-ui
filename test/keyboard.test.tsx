@@ -199,6 +199,39 @@ test("a combobox moves its highlight without moving focus off the input", async 
   expect(document.getElementById(input.getAttribute("aria-activedescendant")!)).toBeTruthy()
 })
 
+test("a control held back by a reason stays reachable, and still refuses to act", async () => {
+  const user = userEvent.setup()
+  let fired = 0
+  render(
+    <>
+      <Button disabled onClick={() => { fired++ }}>Not applicable</Button>
+      <Button disabled focusableWhenDisabled onClick={() => { fired++ }}>
+        Resend in 24s
+      </Button>
+    </>
+  )
+
+  const plain = screen.getByRole("button", { name: "Not applicable" })
+  const held = screen.getByRole("button", { name: "Resend in 24s" })
+
+  // The default takes the control out of the tab order, which is right when there is
+  // nothing to explain. When there *is* — and here the explanation is the label
+  // itself — it puts the reason out of reach of the person most likely to need it.
+  expect(plain.hasAttribute("disabled")).toBe(true)
+  expect(held.hasAttribute("disabled")).toBe(false)
+  expect(held.getAttribute("aria-disabled")).toBe("true")
+
+  await user.tab()
+  expect(document.activeElement).toBe(held)
+
+  // Reachable is not the same as operable. Both routes in, both refused — this is the
+  // property the whole recommendation rests on, so it is asserted rather than assumed.
+  await user.keyboard("{Enter}")
+  await user.keyboard(" ")
+  await user.click(held)
+  expect(fired).toBe(0)
+})
+
 /* ── state: does the control say what it is doing ─────────────────────────── */
 
 test("an accordion trigger reports expanded, and the keyboard flips it", async () => {

@@ -163,6 +163,49 @@ For the chart ramp specifically: categorical series are told apart by **hue**, n
 lightness. Keep the five at least ~50 degrees apart. An earlier ramp had two teals
 three degrees apart, which is one series as far as a reader is concerned.
 
+### Unavailable is two states, not one
+
+`disabled` takes a control out of the tab order. Nobody arriving by keyboard can land
+on it, which also means nobody can find out **why** it is unavailable. That is the
+right default for a control that is simply not applicable, and it is what `Button`
+does when you pass `disabled` on its own.
+
+It is the wrong trade for a control somebody is actively trying to use — a Submit a
+validation gate is holding, an action they lack permission for, a Resend counting
+down. There, add `focusableWhenDisabled`:
+
+```tsx
+<Button disabled={seconds > 0} focusableWhenDisabled>
+  Resend in {seconds}s
+</Button>
+```
+
+Base UI swaps the native attribute for `aria-disabled="true"`. The button stays
+reachable, announces itself as dimmed, and still refuses to activate by mouse or by
+keyboard — `test/keyboard.test.tsx` asserts that last part rather than trusting it,
+because the whole recommendation rests on it. Put the reason in the label or a tooltip
+and it becomes findable.
+
+The dimming hangs off `data-disabled`, which Base UI sets in both cases, not the
+`:disabled` pseudo-class, which matches only the first. It used to be the
+pseudo-class, and the accessible option rendered at full opacity — the system styled
+the worse choice and left the better one looking broken. `pointer-events-none` stays
+on the native case only: an `aria-disabled` button has to keep its pointer events or
+the tooltip explaining it cannot be hovered.
+
+### The system says nothing about permissions
+
+There is no role, policy or viewer anywhere in `src/`, and there should not be. A
+design system cannot enforce access control — enforcement in the browser is not
+enforcement — and every product's permission vocabulary differs, so a `variant`
+encoding one would fit nobody. What belongs here is the means of expression:
+`EmptyState` takes whatever words are true, `Badge` carries a status, a control can be
+held back with a reason. `SECURITY.md` states the boundary; keep it stated.
+
+The one thing to get right in a template is not claiming otherwise. Copy like
+"everything you have access to" above a table that filters nothing is a sentence
+somebody takes at face value.
+
 ### Components follow the `data-slot` convention
 
 Every primitive is a plain function component that sets `data-slot="…"`, in the
